@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace Raktar;
+namespace Raktar.Data;
 
 public partial class WarehouseDbContext : DbContext
 {
