@@ -13,7 +13,4 @@ public partial class Address
 
     public virtual SimpleAddress? SimpleAddress { get; set; }
 
-    //This is a comment made by Gergo who is indeed a gamer (If you want some drawings, my commisions are open)
-
-    //kumbej
 }
