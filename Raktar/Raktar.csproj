@@ -11,7 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Entities\Raktar.DataContext.csproj" />
+    <ProjectReference Include="..\Raktar.DataContext\Raktar.DataContext.csproj" />
+    <ProjectReference Include="..\Raktar.Services\Raktar.Services.csproj" />
   </ItemGroup>
 
 </Project>

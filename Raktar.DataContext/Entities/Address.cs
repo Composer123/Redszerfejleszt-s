@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Raktar.DataContext.Entities;
+namespace Raktar.DataContext;
 
 public partial class Address
 {
@@ -12,5 +12,4 @@ public partial class Address
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
     public virtual SimpleAddress? SimpleAddress { get; set; }
-
 }

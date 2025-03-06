@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Entities\Raktar.DataContext.csproj" />
+    <ProjectReference Include="..\Raktar.DataContext\Raktar.DataContext.csproj" />
   </ItemGroup>
 
 </Project>

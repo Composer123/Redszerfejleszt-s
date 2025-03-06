@@ -1,7 +1,6 @@
-﻿using Entities.Entities;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 
 namespace Raktar.DataContext.Context;
 
@@ -48,7 +47,7 @@ public partial class WarehouseDbContext : DbContext
     {
         modelBuilder.Entity<Address>(entity =>
         {
-            entity.HasKey(e => e.AddressId).HasName("PK__Addresse__091C2AFB84C7EA3B");
+            entity.HasKey(e => e.AddressId).HasName("PK__Addresse__091C2AFB60BA715B");
         });
 
         modelBuilder.Entity<Block>(entity =>
@@ -62,7 +61,7 @@ public partial class WarehouseDbContext : DbContext
 
         modelBuilder.Entity<Cart>(entity =>
         {
-            entity.HasKey(e => e.ProductId).HasName("PK__Cart__B40CC6EDD8C1DB24");
+            entity.HasKey(e => e.ProductId).HasName("PK__Cart__B40CC6ED09992C65");
 
             entity.ToTable("Cart");
 
@@ -82,7 +81,7 @@ public partial class WarehouseDbContext : DbContext
 
         modelBuilder.Entity<Feedback>(entity =>
         {
-            entity.HasKey(e => e.FeedbackId).HasName("PK__Feedback__6A4BEDF6DF8EF7F4");
+            entity.HasKey(e => e.FeedbackId).HasName("PK__Feedback__6A4BEDF68F53A804");
 
             entity.ToTable("Feedback");
 
@@ -94,7 +93,7 @@ public partial class WarehouseDbContext : DbContext
 
         modelBuilder.Entity<LandRegistryNumber>(entity =>
         {
-            entity.HasKey(e => e.AddressId).HasName("PK__LandRegi__091C2AFB9AAC710C");
+            entity.HasKey(e => e.AddressId).HasName("PK__LandRegi__091C2AFB1F8F2515");
 
             entity.Property(e => e.AddressId).ValueGeneratedNever();
             entity.Property(e => e.Contents)
@@ -114,7 +113,7 @@ public partial class WarehouseDbContext : DbContext
 
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BAFE90EE8DC");
+            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BAF3621DA92");
 
             entity.Property(e => e.OrderId)
                 .ValueGeneratedNever()
@@ -137,7 +136,7 @@ public partial class WarehouseDbContext : DbContext
 
         modelBuilder.Entity<Privilage>(entity =>
         {
-            entity.HasKey(e => e.RoleId).HasName("PK__Privilag__8AFACE3A2ECAB26B");
+            entity.HasKey(e => e.RoleId).HasName("PK__Privilag__8AFACE3A0CCFA2A5");
 
             entity.Property(e => e.RoleId)
                 .ValueGeneratedNever()
@@ -155,7 +154,7 @@ public partial class WarehouseDbContext : DbContext
 
         modelBuilder.Entity<Product>(entity =>
         {
-            entity.HasKey(e => e.ProductId).HasName("PK__Product__B40CC6EDD81B407D");
+            entity.HasKey(e => e.ProductId).HasName("PK__Product__B40CC6ED629E7A0C");
 
             entity.ToTable("Product");
 
@@ -169,7 +168,7 @@ public partial class WarehouseDbContext : DbContext
 
         modelBuilder.Entity<Role>(entity =>
         {
-            entity.HasKey(e => e.RoleId).HasName("PK__Role__8AFACE3A4DA9AC5C");
+            entity.HasKey(e => e.RoleId).HasName("PK__Role__8AFACE3A17B6AE76");
 
             entity.ToTable("Role");
 
@@ -181,7 +180,7 @@ public partial class WarehouseDbContext : DbContext
 
         modelBuilder.Entity<Settlement>(entity =>
         {
-            entity.HasKey(e => e.SettlementId).HasName("PK__Settleme__7712545AF4762AE8");
+            entity.HasKey(e => e.SettlementId).HasName("PK__Settleme__7712545A7B9551EF");
 
             entity.HasIndex(e => e.PostCode, "idx_PostCode");
 
@@ -193,7 +192,7 @@ public partial class WarehouseDbContext : DbContext
 
         modelBuilder.Entity<SimpleAddress>(entity =>
         {
-            entity.HasKey(e => e.AddressId).HasName("PK__SimpleAd__091C2AFB9D3C7D8D");
+            entity.HasKey(e => e.AddressId).HasName("PK__SimpleAd__091C2AFBD9E957D5");
 
             entity.Property(e => e.AddressId).ValueGeneratedNever();
             entity.Property(e => e.StreetName)
@@ -216,7 +215,7 @@ public partial class WarehouseDbContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4C5E98F91D");
+            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4C87BA2F01");
 
             entity.Property(e => e.UserId).ValueGeneratedNever();
             entity.Property(e => e.Email).HasMaxLength(320);

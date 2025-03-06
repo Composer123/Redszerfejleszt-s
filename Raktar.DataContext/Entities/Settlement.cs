@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Raktar.DataContext.Entities;
+namespace Raktar.DataContext;
 
 public partial class Settlement
 {
