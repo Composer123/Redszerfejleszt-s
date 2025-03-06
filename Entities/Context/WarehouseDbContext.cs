@@ -1,8 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Entities.Entities;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
 
-namespace Raktar.Data;
+namespace Raktar.DataContext.Context;
 
 public partial class WarehouseDbContext : DbContext
 {
