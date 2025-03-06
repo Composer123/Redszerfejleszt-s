@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Raktar.DataContext;
+namespace Raktar.DataContext.Model;
 
 public partial class Privilage
 {
