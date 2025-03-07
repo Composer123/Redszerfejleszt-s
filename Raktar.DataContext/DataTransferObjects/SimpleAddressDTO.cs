@@ -18,10 +18,8 @@ namespace Raktar.DataContext.DataTransferObjects
 
         public int? DoorNumber { get; set; }
     }
-    public class SimpleAddressCreateDTO : IAddressDTO
+    public class SimpleAddressCreateDTO : IAddressCreateDTO
     {
-        [Required]
-        public int AddressId { get; set; }
         [Required]
         public int SettlementId { get; set; }
         [Required]

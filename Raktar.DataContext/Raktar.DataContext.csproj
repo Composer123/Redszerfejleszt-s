@@ -7,9 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Context\" />
-    <Folder Include="Entities\" />
-    <Folder Include="Migrations\" />
+    <Compile Remove="Context\**" />
+    <Compile Remove="Entities\**" />
+    <Compile Remove="Migrations\**" />
+    <EmbeddedResource Remove="Context\**" />
+    <EmbeddedResource Remove="Entities\**" />
+    <EmbeddedResource Remove="Migrations\**" />
+    <None Remove="Context\**" />
+    <None Remove="Entities\**" />
+    <None Remove="Migrations\**" />
   </ItemGroup>
 
   <ItemGroup>

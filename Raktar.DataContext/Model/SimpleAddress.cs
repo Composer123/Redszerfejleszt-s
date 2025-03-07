@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace Raktar.DataContext.Model;
 
 public partial class SimpleAddress
 {
-    [Required]
     public int AddressId { get; set; }
 
     public int SettlementId { get; set; }
