@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Raktar.DataContext;
+namespace Raktar.DataContext.Entities;
 
 public partial class User
 {
@@ -17,5 +17,5 @@ public partial class User
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
-    public virtual ICollection<Privilage> Privilages { get; set; } = new List<Privilage>();
+    public virtual ICollection<Role> Roles { get; set; } = new List<Role>();
 }
