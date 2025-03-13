@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Raktar.DataContext.Dtos
+namespace Raktar.DataContext.DataTransferObjects
 {
     public class SettlementDTO
     {

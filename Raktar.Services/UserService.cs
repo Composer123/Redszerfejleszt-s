@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Raktar.DataContext;
-using Raktar.DataContext.Dtos;
+using Raktar.DataContext.DataTransferObjects;
 using Raktar.DataContext.Entities;
 
 namespace Raktar.Services
@@ -35,9 +36,9 @@ namespace Raktar.Services
 
             if (userDto.Roles != null)
             {
-                foreach (var roleId in userDto.Roles)
+                foreach (var userRole in userDto.Roles)
                 {
-                    var existingRole = await _context.Roles.FirstOrDefaultAsync(r => r.Id == roleId);
+                    var existingRole = await _context.Roles.FirstOrDefaultAsync(r => r.RoleId == userRole.RoleId);
                     if (existingRole != null)
                     {
                         user.Roles.Add(existingRole);
@@ -58,10 +59,10 @@ namespace Raktar.Services
 
         private async Task<Role> GetDefaultCustomerRoleAsync()
         {
-            var customerRole = await _context.Roles.FirstOrDefaultAsync(r => r.Name == "Customer");
+            var customerRole = await _context.Roles.FirstOrDefaultAsync(r => r.RoleName == "Customer");
             if (customerRole == null)
             {
-                customerRole = new Role { Name = "Customer" };
+                customerRole = new Role { RoleName = "Customer" };
                 await _context.Roles.AddAsync(customerRole);
                 await _context.SaveChangesAsync();
             }
@@ -77,12 +78,12 @@ namespace Raktar.Services
             }
 
             //return _jwtService.GenerateToken(user);
-            return user.Name;
+            return user.Username;
         }
 
         public async Task<UserDTO> UpdateProfileAsync(int userId, UserUpdateDTO userDto)
         {
-            var user = await _context.Users.Include(u => u.Roles).FirstOrDefaultAsync(u => u.Id == userId);
+            var user = await _context.Users.Include(u => u.Roles).FirstOrDefaultAsync(u => u.UserId == userId);
             if (user == null)
             {
                 throw new KeyNotFoundException("User not found.");
@@ -94,9 +95,9 @@ namespace Raktar.Services
             {
                 user.Roles.Clear();
 
-                foreach (var roleId in userDto.Roles)
+                foreach (var userRole in userDto.Roles)
                 {
-                    var existingRole = await _context.Roles.FirstOrDefaultAsync(r => r.Id == roleId);
+                    var existingRole = await _context.Roles.FirstOrDefaultAsync(r => r.RoleId == userRole.RoleId);
                     if (existingRole != null)
                     {
                         user.Roles.Add(existingRole);

@@ -1,7 +1,7 @@
 ﻿using Raktar.DataContext.Entities;
 using System.ComponentModel.DataAnnotations;
 
-namespace Raktar.DataContext.Dtos
+namespace Raktar.DataContext.DataTransferObjects
 {
     public class UserDTO
     {
@@ -15,14 +15,13 @@ namespace Raktar.DataContext.Dtos
 
         public byte[] Password { get; set; }
 
-        public ICollection<Order> Orders { get; set; } = new List<Order>();
+        public ICollection<Order> Orders { get; set; }
 
-        public ICollection<Role> Roles { get; set; } = new List<Role>();
+        public ICollection<Role> Roles { get; set; }
     }
 
     public class UserRegisterDTO
     {
-       
         [Phone]
         public int TelephoneNumber { get; set; }
 
@@ -37,10 +36,7 @@ namespace Raktar.DataContext.Dtos
         [Required]
         [MinLength(6)]
         public byte[] Password { get; set; }
-
-        public ICollection<Order> Orders { get; set; } = new List<Order>();
-
-        public ICollection<Role> Roles { get; set; } = new List<Role>();
+        public ICollection<RoleDTO> Roles { get; set; }
     }
     public class UserLoginDTO
     {
@@ -53,7 +49,6 @@ namespace Raktar.DataContext.Dtos
     }
     public class UserUpdateDTO
     {
-        [Required]
         [StringLength(50)]
         public string Username { get; set; }
 
