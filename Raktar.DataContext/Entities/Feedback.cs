@@ -7,7 +7,7 @@ public partial class Feedback
 {
     public int FeedbackId { get; set; }
 
-    public string? FeedbackText { get; set; }
+    public string FeedbackText { get; set; }
 
-    public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
+    public ICollection<Cart> Carts { get; set; } = new List<Cart>();
 }

@@ -2,24 +2,34 @@
 using System.Collections.Generic;
 
 namespace Raktar.DataContext.Entities;
-
+public enum OrderStatus
+{
+    Pending,
+    Accepted,
+    ReadyForDelivery,
+    Delivered,
+    Cancelled,
+    Undeliverible
+}
 public partial class Order
 {
-    public int? UserId { get; set; }
+
+    public int UserId { get; set; }
 
     public int OrderId { get; set; }
 
-    public int? DeliveryAdressId { get; set; }
+    public int DeliveryAdressId { get; set; }
 
-    public DateTime? OrderDate { get; set; }
+    public DateTime OrderDate { get; set; }
 
     public DateTime? DeliveryDate { get; set; }
 
-    public string? Status { get; set; }
+    public OrderStatus Status { get; set; }
 
-    public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
+    public ICollection<Cart> Carts { get; set; } = new List<Cart>();
 
-    public virtual Address? DeliveryAdress { get; set; }
+    public Address DeliveryAdress { get; set; }
 
-    public virtual User? User { get; set; }
+    public User User { get; set; }
+
 }
