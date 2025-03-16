@@ -9,5 +9,5 @@ public partial class Feedback
 
     public string FeedbackText { get; set; }
 
-    public ICollection<Cart> Carts { get; set; } = new List<Cart>();
+    public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 }

@@ -26,7 +26,7 @@ public partial class Order
 
     public OrderStatus Status { get; set; }
 
-    public ICollection<Cart> Carts { get; set; } = new List<Cart>();
+    public ICollection<OrderItem> OrderItems { get; set; }
 
     public Address DeliveryAdress { get; set; }
 

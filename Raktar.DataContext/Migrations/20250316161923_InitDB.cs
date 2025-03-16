@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Raktar.DataContext.Migrations
 {
     /// <inheritdoc />
-    public partial class Initialization : Migration
+    public partial class InitDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -27,8 +27,9 @@ namespace Raktar.DataContext.Migrations
                 name: "Feedback",
                 columns: table => new
                 {
-                    FeedbackID = table.Column<int>(type: "int", nullable: false),
-                    FeedbackText = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true)
+                    FeedbackID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FeedbackText = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -39,11 +40,12 @@ namespace Raktar.DataContext.Migrations
                 name: "Product",
                 columns: table => new
                 {
-                    ProductID = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(350)", maxLength: 350, nullable: true),
-                    Price = table.Column<decimal>(type: "money", nullable: true),
-                    Type = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
-                    Stock = table.Column<int>(type: "int", nullable: true),
+                    ProductID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(350)", maxLength: 350, nullable: false),
+                    Price = table.Column<decimal>(type: "money", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
+                    Stock = table.Column<int>(type: "int", nullable: false),
                     MaxQuantityPerBlock = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -55,8 +57,9 @@ namespace Raktar.DataContext.Migrations
                 name: "Role",
                 columns: table => new
                 {
-                    RoleID = table.Column<int>(type: "int", nullable: false),
-                    RoleName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true)
+                    RoleID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RoleName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -67,9 +70,10 @@ namespace Raktar.DataContext.Migrations
                 name: "Settlements",
                 columns: table => new
                 {
-                    SettlementId = table.Column<int>(type: "int", nullable: false),
-                    PostCode = table.Column<int>(type: "int", nullable: true),
-                    SettlementName = table.Column<string>(type: "varchar(20)", unicode: false, maxLength: 20, nullable: true)
+                    SettlementId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PostCode = table.Column<int>(type: "int", nullable: false),
+                    SettlementName = table.Column<string>(type: "varchar(20)", unicode: false, maxLength: 20, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -80,11 +84,12 @@ namespace Raktar.DataContext.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    TelephoneNumber = table.Column<int>(type: "int", nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(320)", maxLength: 320, nullable: true),
-                    Username = table.Column<string>(type: "nvarchar(320)", maxLength: 320, nullable: true),
-                    Password = table.Column<byte[]>(type: "varbinary(128)", maxLength: 128, nullable: true)
+                    UserId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TelephoneNumber = table.Column<int>(type: "int", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(320)", maxLength: 320, nullable: false),
+                    Username = table.Column<string>(type: "nvarchar(320)", maxLength: 320, nullable: false),
+                    Password = table.Column<byte[]>(type: "varbinary(128)", maxLength: 128, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -95,14 +100,16 @@ namespace Raktar.DataContext.Migrations
                 name: "Blocks",
                 columns: table => new
                 {
+                    StorageId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     ProductId = table.Column<int>(type: "int", nullable: true),
-                    StorageId = table.Column<int>(type: "int", nullable: true),
-                    Quantity = table.Column<int>(type: "int", nullable: true)
+                    Quantity = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
+                    table.PrimaryKey("PK_Blocks", x => x.StorageId);
                     table.ForeignKey(
-                        name: "FK__Blocks__ProductI__403A8C7D",
+                        name: "FK__Products_Blocks",
                         column: x => x.ProductId,
                         principalTable: "Product",
                         principalColumn: "ProductID");
@@ -114,7 +121,7 @@ namespace Raktar.DataContext.Migrations
                 {
                     AddressId = table.Column<int>(type: "int", nullable: false),
                     SettlementId = table.Column<int>(type: "int", nullable: false),
-                    Contents = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: true)
+                    Contents = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -123,7 +130,8 @@ namespace Raktar.DataContext.Migrations
                         name: "FK__LandRegis__Addre__4D94879B",
                         column: x => x.AddressId,
                         principalTable: "Addresses",
-                        principalColumn: "AddressId");
+                        principalColumn: "AddressId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK__LandRegis__Settl__4E88ABD4",
                         column: x => x.SettlementId,
@@ -137,9 +145,9 @@ namespace Raktar.DataContext.Migrations
                 {
                     AddressId = table.Column<int>(type: "int", nullable: false),
                     SettlementId = table.Column<int>(type: "int", nullable: false),
-                    StreetName = table.Column<string>(type: "varchar(100)", unicode: false, maxLength: 100, nullable: true),
-                    StreetType = table.Column<string>(type: "varchar(20)", unicode: false, maxLength: 20, nullable: true),
-                    HouseNumber = table.Column<int>(type: "int", nullable: true),
+                    StreetName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    StreetType = table.Column<int>(type: "int", unicode: false, maxLength: 20, nullable: false),
+                    HouseNumber = table.Column<int>(type: "int", nullable: false),
                     StairwayNumber = table.Column<int>(type: "int", nullable: true),
                     FloorNumber = table.Column<int>(type: "int", nullable: true),
                     DoorNumber = table.Column<int>(type: "int", nullable: true)
@@ -151,7 +159,8 @@ namespace Raktar.DataContext.Migrations
                         name: "FK__SimpleAdd__Addre__49C3F6B7",
                         column: x => x.AddressId,
                         principalTable: "Addresses",
-                        principalColumn: "AddressId");
+                        principalColumn: "AddressId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK__SimpleAdd__Settl__4AB81AF0",
                         column: x => x.SettlementId,
@@ -163,12 +172,13 @@ namespace Raktar.DataContext.Migrations
                 name: "Orders",
                 columns: table => new
                 {
-                    OrderID = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: true),
-                    DeliveryAdressID = table.Column<int>(type: "int", nullable: true),
-                    OrderDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    OrderID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    DeliveryAdressID = table.Column<int>(type: "int", nullable: false),
+                    OrderDate = table.Column<DateTime>(type: "datetime", nullable: false),
                     DeliveryDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    Status = table.Column<string>(type: "varchar(1)", unicode: false, maxLength: 1, nullable: true)
+                    Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -177,12 +187,14 @@ namespace Raktar.DataContext.Migrations
                         name: "FK__Orders__Delivery__52593CB8",
                         column: x => x.DeliveryAdressID,
                         principalTable: "Addresses",
-                        principalColumn: "AddressId");
+                        principalColumn: "AddressId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK__Orders__UserId__5165187F",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "UserId");
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -208,27 +220,34 @@ namespace Raktar.DataContext.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Cart",
+                name: "OrderItem",
                 columns: table => new
                 {
-                    ProductID = table.Column<int>(type: "int", nullable: false),
-                    OrderID = table.Column<int>(type: "int", nullable: true),
-                    Quantity = table.Column<int>(type: "int", nullable: true),
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    OrderId = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
                     FeedbackId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__Cart__B40CC6ED54605DBE", x => x.ProductID);
+                    table.PrimaryKey("PK__Cart__B40CC6ED54605DBE", x => new { x.ProductId, x.OrderId });
                     table.ForeignKey(
                         name: "FK__Cart__FeedbackId__5629CD9C",
                         column: x => x.FeedbackId,
                         principalTable: "Feedback",
                         principalColumn: "FeedbackID");
                     table.ForeignKey(
-                        name: "FK__Cart__OrderID__5535A963",
-                        column: x => x.OrderID,
+                        name: "FK__Orders__OrderItems",
+                        column: x => x.OrderId,
                         principalTable: "Orders",
-                        principalColumn: "OrderID");
+                        principalColumn: "OrderID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK__Products_OrderItems",
+                        column: x => x.ProductId,
+                        principalTable: "Product",
+                        principalColumn: "ProductID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -237,19 +256,19 @@ namespace Raktar.DataContext.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Cart_FeedbackId",
-                table: "Cart",
-                column: "FeedbackId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Cart_OrderID",
-                table: "Cart",
-                column: "OrderID");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_LandRegistryNumbers_SettlementId",
                 table: "LandRegistryNumbers",
                 column: "SettlementId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderItem_FeedbackId",
+                table: "OrderItem",
+                column: "FeedbackId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderItem_OrderId",
+                table: "OrderItem",
+                column: "OrderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_DeliveryAdressID",
@@ -284,10 +303,10 @@ namespace Raktar.DataContext.Migrations
                 name: "Blocks");
 
             migrationBuilder.DropTable(
-                name: "Cart");
+                name: "LandRegistryNumbers");
 
             migrationBuilder.DropTable(
-                name: "LandRegistryNumbers");
+                name: "OrderItem");
 
             migrationBuilder.DropTable(
                 name: "Privilages");
@@ -296,13 +315,13 @@ namespace Raktar.DataContext.Migrations
                 name: "SimpleAddresses");
 
             migrationBuilder.DropTable(
-                name: "Product");
-
-            migrationBuilder.DropTable(
                 name: "Feedback");
 
             migrationBuilder.DropTable(
                 name: "Orders");
+
+            migrationBuilder.DropTable(
+                name: "Product");
 
             migrationBuilder.DropTable(
                 name: "Role");

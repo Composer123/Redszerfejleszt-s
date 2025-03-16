@@ -17,7 +17,7 @@ namespace Raktar.DataContext.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.2")
+                .HasAnnotation("ProductVersion", "9.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -55,53 +55,36 @@ namespace Raktar.DataContext.Migrations
 
             modelBuilder.Entity("Raktar.DataContext.Entities.Block", b =>
                 {
+                    b.Property<int>("StorageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StorageId"));
+
                     b.Property<int?>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Quantity")
+                    b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<int?>("StorageId")
-                        .HasColumnType("int");
+                    b.HasKey("StorageId");
 
                     b.HasIndex("ProductId");
 
                     b.ToTable("Blocks");
                 });
 
-            modelBuilder.Entity("Raktar.DataContext.Entities.Cart", b =>
-                {
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int")
-                        .HasColumnName("ProductID");
-
-                    b.Property<int?>("FeedbackId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("OrderId")
-                        .HasColumnType("int")
-                        .HasColumnName("OrderID");
-
-                    b.Property<int?>("Quantity")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProductId")
-                        .HasName("PK__Cart__B40CC6ED54605DBE");
-
-                    b.HasIndex("FeedbackId");
-
-                    b.HasIndex("OrderId");
-
-                    b.ToTable("Cart", (string)null);
-                });
-
             modelBuilder.Entity("Raktar.DataContext.Entities.Feedback", b =>
                 {
                     b.Property<int>("FeedbackId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("FeedbackID");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FeedbackId"));
+
                     b.Property<string>("FeedbackText")
+                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -117,6 +100,7 @@ namespace Raktar.DataContext.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Contents")
+                        .IsRequired()
                         .HasMaxLength(60)
                         .IsUnicode(false)
                         .HasColumnType("varchar(60)");
@@ -135,25 +119,26 @@ namespace Raktar.DataContext.Migrations
             modelBuilder.Entity("Raktar.DataContext.Entities.Order", b =>
                 {
                     b.Property<int>("OrderId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("OrderID");
 
-                    b.Property<int?>("DeliveryAdressId")
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"));
+
+                    b.Property<int>("DeliveryAdressId")
                         .HasColumnType("int")
                         .HasColumnName("DeliveryAdressID");
 
                     b.Property<DateTime?>("DeliveryDate")
                         .HasColumnType("datetime");
 
-                    b.Property<DateTime?>("OrderDate")
+                    b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime");
 
-                    b.Property<string>("Status")
-                        .HasMaxLength(1)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(1)");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("OrderId")
@@ -166,26 +151,55 @@ namespace Raktar.DataContext.Migrations
                     b.ToTable("Orders");
                 });
 
+            modelBuilder.Entity("Raktar.DataContext.Entities.OrderItem", b =>
+                {
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("FeedbackId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProductId", "OrderId")
+                        .HasName("PK__Cart__B40CC6ED54605DBE");
+
+                    b.HasIndex("FeedbackId");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("OrderItem", (string)null);
+                });
+
             modelBuilder.Entity("Raktar.DataContext.Entities.Product", b =>
                 {
                     b.Property<int>("ProductId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("ProductID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductId"));
 
                     b.Property<int?>("MaxQuantityPerBlock")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasMaxLength(350)
                         .HasColumnType("nvarchar(350)");
 
-                    b.Property<decimal?>("Price")
+                    b.Property<decimal>("Price")
                         .HasColumnType("money");
 
-                    b.Property<int?>("Stock")
+                    b.Property<int>("Stock")
                         .HasColumnType("int");
 
                     b.Property<string>("Type")
+                        .IsRequired()
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
 
@@ -198,10 +212,14 @@ namespace Raktar.DataContext.Migrations
             modelBuilder.Entity("Raktar.DataContext.Entities.Role", b =>
                 {
                     b.Property<int>("RoleId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("RoleID");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoleId"));
+
                     b.Property<string>("RoleName")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -214,12 +232,16 @@ namespace Raktar.DataContext.Migrations
             modelBuilder.Entity("Raktar.DataContext.Entities.Settlement", b =>
                 {
                     b.Property<int>("SettlementId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int?>("PostCode")
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SettlementId"));
+
+                    b.Property<int>("PostCode")
                         .HasColumnType("int");
 
                     b.Property<string>("SettlementName")
+                        .IsRequired()
                         .HasMaxLength(20)
                         .IsUnicode(false)
                         .HasColumnType("varchar(20)");
@@ -243,7 +265,7 @@ namespace Raktar.DataContext.Migrations
                     b.Property<int?>("FloorNumber")
                         .HasColumnType("int");
 
-                    b.Property<int?>("HouseNumber")
+                    b.Property<int>("HouseNumber")
                         .HasColumnType("int");
 
                     b.Property<int>("SettlementId")
@@ -253,14 +275,15 @@ namespace Raktar.DataContext.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("StreetName")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("StreetType")
+                    b.Property<int>("StreetType")
                         .HasMaxLength(20)
                         .IsUnicode(false)
-                        .HasColumnType("varchar(20)");
+                        .HasColumnType("int");
 
                     b.HasKey("AddressId")
                         .HasName("PK__SimpleAd__091C2AFB241679E9");
@@ -273,20 +296,26 @@ namespace Raktar.DataContext.Migrations
             modelBuilder.Entity("Raktar.DataContext.Entities.User", b =>
                 {
                     b.Property<int>("UserId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
+
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(320)
                         .HasColumnType("nvarchar(320)");
 
                     b.Property<byte[]>("Password")
+                        .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("varbinary(128)");
 
-                    b.Property<int?>("TelephoneNumber")
+                    b.Property<int>("TelephoneNumber")
                         .HasColumnType("int");
 
                     b.Property<string>("Username")
+                        .IsRequired()
                         .HasMaxLength(320)
                         .HasColumnType("nvarchar(320)");
 
@@ -314,28 +343,11 @@ namespace Raktar.DataContext.Migrations
             modelBuilder.Entity("Raktar.DataContext.Entities.Block", b =>
                 {
                     b.HasOne("Raktar.DataContext.Entities.Product", "Product")
-                        .WithMany()
+                        .WithMany("Blocks")
                         .HasForeignKey("ProductId")
-                        .HasConstraintName("FK__Blocks__ProductI__403A8C7D");
+                        .HasConstraintName("FK__Products_Blocks");
 
                     b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("Raktar.DataContext.Entities.Cart", b =>
-                {
-                    b.HasOne("Raktar.DataContext.Entities.Feedback", "Feedback")
-                        .WithMany("Carts")
-                        .HasForeignKey("FeedbackId")
-                        .HasConstraintName("FK__Cart__FeedbackId__5629CD9C");
-
-                    b.HasOne("Raktar.DataContext.Entities.Order", "Order")
-                        .WithMany("Carts")
-                        .HasForeignKey("OrderId")
-                        .HasConstraintName("FK__Cart__OrderID__5535A963");
-
-                    b.Navigation("Feedback");
-
-                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("Raktar.DataContext.Entities.LandRegistryNumber", b =>
@@ -343,6 +355,7 @@ namespace Raktar.DataContext.Migrations
                     b.HasOne("Raktar.DataContext.Entities.Address", "Address")
                         .WithOne("LandRegistryNumber")
                         .HasForeignKey("Raktar.DataContext.Entities.LandRegistryNumber", "AddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("FK__LandRegis__Addre__4D94879B");
 
@@ -362,11 +375,15 @@ namespace Raktar.DataContext.Migrations
                     b.HasOne("Raktar.DataContext.Entities.Address", "DeliveryAdress")
                         .WithMany("Orders")
                         .HasForeignKey("DeliveryAdressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("FK__Orders__Delivery__52593CB8");
 
                     b.HasOne("Raktar.DataContext.Entities.User", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("FK__Orders__UserId__5165187F");
 
                     b.Navigation("DeliveryAdress");
@@ -374,11 +391,40 @@ namespace Raktar.DataContext.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Raktar.DataContext.Entities.OrderItem", b =>
+                {
+                    b.HasOne("Raktar.DataContext.Entities.Feedback", "Feedback")
+                        .WithMany("OrderItems")
+                        .HasForeignKey("FeedbackId")
+                        .HasConstraintName("FK__Cart__FeedbackId__5629CD9C");
+
+                    b.HasOne("Raktar.DataContext.Entities.Order", "Order")
+                        .WithMany("OrderItems")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK__Orders__OrderItems");
+
+                    b.HasOne("Raktar.DataContext.Entities.Product", "Product")
+                        .WithMany("OrderItems")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK__Products_OrderItems");
+
+                    b.Navigation("Feedback");
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("Raktar.DataContext.Entities.SimpleAddress", b =>
                 {
                     b.HasOne("Raktar.DataContext.Entities.Address", "Address")
                         .WithOne("SimpleAddress")
                         .HasForeignKey("Raktar.DataContext.Entities.SimpleAddress", "AddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("FK__SimpleAdd__Addre__49C3F6B7");
 
@@ -404,12 +450,19 @@ namespace Raktar.DataContext.Migrations
 
             modelBuilder.Entity("Raktar.DataContext.Entities.Feedback", b =>
                 {
-                    b.Navigation("Carts");
+                    b.Navigation("OrderItems");
                 });
 
             modelBuilder.Entity("Raktar.DataContext.Entities.Order", b =>
                 {
-                    b.Navigation("Carts");
+                    b.Navigation("OrderItems");
+                });
+
+            modelBuilder.Entity("Raktar.DataContext.Entities.Product", b =>
+                {
+                    b.Navigation("Blocks");
+
+                    b.Navigation("OrderItems");
                 });
 
             modelBuilder.Entity("Raktar.DataContext.Entities.Settlement", b =>

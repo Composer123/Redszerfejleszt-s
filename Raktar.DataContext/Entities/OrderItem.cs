@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Raktar.DataContext.Entities;
 
-public partial class Cart
+public partial class OrderItem
 {
     public int ProductId { get; set; }
 
@@ -16,4 +16,5 @@ public partial class Cart
     public Feedback? Feedback { get; set; }
 
     public Order Order { get; set; }
+    public Product Product { get; set; }
 }
