@@ -15,4 +15,8 @@
     <ProjectReference Include="..\Raktar.Services\Raktar.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+  </ItemGroup>
+
 </Project>
