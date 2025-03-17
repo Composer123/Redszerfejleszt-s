@@ -13,9 +13,10 @@ public partial class Product
 
     public string Type { get; set; }
 
-    public int Stock { get; set; }
+    [Obsolete("Don't use stock. Use blocks service to get stock instead.")]
+    public int Stock { get; set; } // TODO: Remove and create new migration. 
 
-    public int? MaxQuantityPerBlock { get; set; }
+    public int MaxQuantityPerBlock { get; set; }
     public ICollection<OrderItem> OrderItems { get; set; }
     public ICollection<Block> Blocks { get; set; }
 }
