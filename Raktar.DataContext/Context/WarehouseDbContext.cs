@@ -20,7 +20,7 @@ public partial class WarehouseDbContext : DbContext
 
     public virtual DbSet<Block> Blocks { get; set; }
 
-    public virtual DbSet<Cart> Carts { get; set; }
+    public virtual DbSet<OrderItem> Carts { get; set; }
 
     public virtual DbSet<Feedback> Feedbacks { get; set; }
 
@@ -51,29 +51,33 @@ public partial class WarehouseDbContext : DbContext
 
         modelBuilder.Entity<Block>(entity =>
         {
-            entity.HasNoKey();
+            entity.HasKey(e => e.StorageId);
 
             entity.HasOne(d => d.Product).WithMany()
                 .HasForeignKey(d => d.ProductId)
                 .HasConstraintName("FK__Blocks__ProductI__403A8C7D");
         });
 
-        modelBuilder.Entity<Cart>(entity =>
+        modelBuilder.Entity<OrderItem>(entity =>
         {
-            entity.HasKey(e => e.ProductId).HasName("PK__Cart__B40CC6ED54605DBE");
+            entity.HasKey(e => new { e.ProductId, e.OrderId }).HasName("PK__Cart__B40CC6ED54605DBE");
 
-            entity.ToTable("Cart");
+            entity.ToTable("OrderItem");
 
             entity.Property(e => e.ProductId)
-                .ValueGeneratedNever()
-                .HasColumnName("ProductID");
-            entity.Property(e => e.OrderId).HasColumnName("OrderID");
+                .ValueGeneratedNever();
+            entity.Property(e => e.OrderId)
+                .ValueGeneratedNever();
 
-            entity.HasOne(d => d.Feedback).WithMany(p => p.Carts)
+            entity.HasOne(d => d.Feedback).WithMany(p => p.OrderItems)
                 .HasForeignKey(d => d.FeedbackId)
                 .HasConstraintName("FK__Cart__FeedbackId__5629CD9C");
 
-            entity.HasOne(d => d.Order).WithMany(p => p.Carts)
+            entity.HasOne(d => d.Product).WithMany(p => p.OrderItems)
+                .HasForeignKey(d => d.ProductId)
+                .HasConstraintName("FK__Cart__ProductID");
+
+            entity.HasOne(d => d.Order).WithMany(p => p.OrderItems)
                 .HasForeignKey(d => d.OrderId)
                 .HasConstraintName("FK__Cart__OrderID__5535A963");
         });
@@ -85,7 +89,6 @@ public partial class WarehouseDbContext : DbContext
             entity.ToTable("Feedback");
 
             entity.Property(e => e.FeedbackId)
-                .ValueGeneratedNever()
                 .HasColumnName("FeedbackID");
             entity.Property(e => e.FeedbackText).HasMaxLength(500);
         });
@@ -101,7 +104,7 @@ public partial class WarehouseDbContext : DbContext
 
             entity.HasOne(d => d.Address).WithOne(p => p.LandRegistryNumber)
                 .HasForeignKey<LandRegistryNumber>(d => d.AddressId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK__LandRegis__Addre__4D94879B");
 
             entity.HasOne(d => d.Settlement).WithMany(p => p.LandRegistryNumbers)
@@ -114,15 +117,10 @@ public partial class WarehouseDbContext : DbContext
         {
             entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BAFC81DC18F");
 
-            entity.Property(e => e.OrderId)
-                .ValueGeneratedNever()
-                .HasColumnName("OrderID");
+            entity.Property(e => e.OrderId).HasColumnName("OrderID");
             entity.Property(e => e.DeliveryAdressId).HasColumnName("DeliveryAdressID");
             entity.Property(e => e.DeliveryDate).HasColumnType("datetime");
             entity.Property(e => e.OrderDate).HasColumnType("datetime");
-            entity.Property(e => e.Status)
-                .HasMaxLength(1)
-                .IsUnicode(false);
 
             entity.HasOne(d => d.DeliveryAdress).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.DeliveryAdressId)
@@ -131,6 +129,10 @@ public partial class WarehouseDbContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("FK__Orders__UserId__5165187F");
+
+            entity.HasMany(d => d.OrderItems).WithOne(p => p.Order)
+                .HasForeignKey(d => d.OrderId)
+                .HasConstraintName("FK__Orders__OrderItems");
         });
 
         modelBuilder.Entity<Product>(entity =>
@@ -139,12 +141,17 @@ public partial class WarehouseDbContext : DbContext
 
             entity.ToTable("Product");
 
-            entity.Property(e => e.ProductId)
-                .ValueGeneratedNever()
-                .HasColumnName("ProductID");
+            entity.Property(e => e.ProductId).HasColumnName("ProductID");
             entity.Property(e => e.Name).HasMaxLength(350);
             entity.Property(e => e.Price).HasColumnType("money");
             entity.Property(e => e.Type).HasMaxLength(300);
+
+            entity.HasMany(p => p.OrderItems).WithOne(p => p.Product)
+                .HasForeignKey(p => p.ProductId)
+                .HasConstraintName("FK__Products_OrderItems");
+            entity.HasMany(p => p.Blocks).WithOne(p => p.Product)
+                .HasForeignKey(p => p.ProductId)
+                .HasConstraintName("FK__Products_Blocks");
         });
 
         modelBuilder.Entity<Role>(entity =>
@@ -153,9 +160,7 @@ public partial class WarehouseDbContext : DbContext
 
             entity.ToTable("Role");
 
-            entity.Property(e => e.RoleId)
-                .ValueGeneratedNever()
-                .HasColumnName("RoleID");
+            entity.Property(e => e.RoleId).HasColumnName("RoleID");
             entity.Property(e => e.RoleName).HasMaxLength(100);
 
             entity.HasMany(d => d.Users).WithMany(p => p.Roles)
@@ -183,10 +188,7 @@ public partial class WarehouseDbContext : DbContext
 
             entity.HasIndex(e => e.PostCode, "idx_PostCode");
 
-            entity.Property(e => e.SettlementId).ValueGeneratedNever();
-            entity.Property(e => e.SettlementName)
-                .HasMaxLength(20)
-                .IsUnicode(false);
+            entity.Property(e => e.SettlementName).HasMaxLength(20).IsUnicode(false);
         });
 
         modelBuilder.Entity<SimpleAddress>(entity =>
@@ -196,14 +198,14 @@ public partial class WarehouseDbContext : DbContext
             entity.Property(e => e.AddressId).ValueGeneratedNever();
             entity.Property(e => e.StreetName)
                 .HasMaxLength(100)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.StreetType)
                 .HasMaxLength(20)
                 .IsUnicode(false);
 
             entity.HasOne(d => d.Address).WithOne(p => p.SimpleAddress)
                 .HasForeignKey<SimpleAddress>(d => d.AddressId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK__SimpleAdd__Addre__49C3F6B7");
 
             entity.HasOne(d => d.Settlement).WithMany(p => p.SimpleAddresses)
@@ -216,7 +218,6 @@ public partial class WarehouseDbContext : DbContext
         {
             entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4C468AD53B");
 
-            entity.Property(e => e.UserId).ValueGeneratedNever();
             entity.Property(e => e.Email).HasMaxLength(320);
             entity.Property(e => e.Password).HasMaxLength(128);
             entity.Property(e => e.Username).HasMaxLength(320);

@@ -1,7 +1,7 @@
 ﻿using Raktar.DataContext.Entities;
 using System.ComponentModel.DataAnnotations;
 
-namespace Raktar.DataContext.Dtos
+namespace Raktar.DataContext.DataTransferObjects
 {
     public class SimpleAddressDTO : IAddressDTO
     {
