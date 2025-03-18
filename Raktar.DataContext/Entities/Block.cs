@@ -7,7 +7,7 @@ public partial class Block
 {
     public int? ProductId { get; set; }
 
-    public int StorageId { get; set; }
+    public int BlockId { get; set; }
 
     public int Quantity { get; set; }
 

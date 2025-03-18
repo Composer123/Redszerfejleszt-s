@@ -13,9 +13,7 @@ public partial class Product
 
     public string Type { get; set; }
 
-    public int Stock { get; set; }
-
-    public int? MaxQuantityPerBlock { get; set; }
+    public int MaxQuantityPerBlock { get; set; }
     public ICollection<OrderItem> OrderItems { get; set; }
     public ICollection<Block> Blocks { get; set; }
 }

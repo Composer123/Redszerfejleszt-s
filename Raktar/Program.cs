@@ -15,6 +15,10 @@ builder.Services.AddDbContext<WarehouseDbContext>(options =>
     options.UseSqlServer("Server=localhost;Database=WarehouseDB;Trusted_Connection=True;TrustServerCertificate=True;");
 });
 
+// Services
+builder.Services.AddScoped<IBlockService, BlockService>();
+
+
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 var app = builder.Build();
