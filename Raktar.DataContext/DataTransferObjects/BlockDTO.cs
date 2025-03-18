@@ -4,7 +4,7 @@ namespace Raktar.DataContext.DataTransferObjects
 {
     public class BlockDTO
     {
-        public int StorageId { get; set; }
+        public int BlockId { get; set; }
 
         public int Quantity { get; set; }
 

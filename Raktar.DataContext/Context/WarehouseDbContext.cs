@@ -51,7 +51,7 @@ public partial class WarehouseDbContext : DbContext
 
         modelBuilder.Entity<Block>(entity =>
         {
-            entity.HasKey(e => e.StorageId);
+            entity.HasKey(e => e.BlockId);
 
             entity.HasOne(d => d.Product).WithMany()
                 .HasForeignKey(d => d.ProductId)
