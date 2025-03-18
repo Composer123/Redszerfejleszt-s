@@ -1,6 +1,32 @@
-@Raktar_HostAddress = http://localhost:5077
+@Raktar_HostAddress = https://localhost:7262
 
-GET {{Raktar_HostAddress}}/weatherforecast/
-Accept: application/json
+@productId=2
+GET {{Raktar_HostAddress}}/api/block/storage/stock/{{productId}}
+
+###
+
+PUT {{Raktar_HostAddress}}/api/block/storage/assign
+Content-Type: application/json
+
+{
+  "Quantity": 90,
+  "Item" : {
+      "ProductId": 2,
+      "MaxQuantityPerBlock": 40
+  }
+}
+
+###
+
+PUT {{Raktar_HostAddress}}/api/block/storage/remove
+Content-Type: application/json
+
+{
+  "Quantity": 45,
+  "Item" : {
+      "ProductId": 2,
+      "MaxQuantityPerBlock": 40
+  }
+}
 
 ###

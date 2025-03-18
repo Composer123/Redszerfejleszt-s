@@ -17,13 +17,30 @@ public class BlockController(IBlockService blockService) : ControllerBase
         return Ok(r);
     }
 
-    [HttpPost("storage/assign")]
-    public async Task<IActionResult> AssignStorage([FromBody] BlockAssignDTO blockDTO)
+    [HttpPut("storage/assign")]
+    public async Task<IActionResult> AssignStorage([FromBody] BlockAssignOrRemoveDTO blockDTO)
     {
-        bool r = await _blockService.TryAssignProductToBlockAsync(blockDTO);
-        if (r)
-            Ok();
+        try
+        {
+            bool r = await _blockService.TryAssignProductToBlockAsync(blockDTO);
+            if (r)
+                return Ok();
 
-        return BadRequest("Product could not be assigned to any blocks.");
+            return BadRequest("Product could not be assigned to any blocks.");
+        }
+        catch (InvalidOperationException opEx)
+        {
+            return BadRequest(opEx.Message);
+        }
+    }
+
+    [HttpPut("storage/remove")]
+    public async Task<IActionResult> RemoveFromStorage([FromBody] BlockAssignOrRemoveDTO removeDTO)
+    {
+        bool r = await _blockService.TryRemoveProductAsync(removeDTO);
+        if (r)
+            return Ok();
+
+        return BadRequest("Product could not be removed from blocks.");
     }
 }

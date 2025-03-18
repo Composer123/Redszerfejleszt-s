@@ -11,12 +11,12 @@ namespace Raktar.DataContext.DataTransferObjects
         public ProductDTO? Item { get; set; }
     }
 
-    public class BlockAssignDTO
+    public class BlockAssignOrRemoveDTO
     {
         [Required]
         [Range(0, int.MaxValue)]
         public int Quantity { get; set; }
         [Required]
-        public required ProductDTO Item { get; set; }
+        public required ProductAssignDTO Item { get; set; }
     }
 }
