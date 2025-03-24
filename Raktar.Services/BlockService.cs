@@ -59,7 +59,7 @@ public class BlockService(WarehouseDbContext context, ILogger<IBlockService> log
         if (assignment.Quantity > maxCapacity)
             return false;
 
-        await PerformAssignment(ref validBlocks, assignment.Quantity, productId, assignment.Item.MaxQuantityPerBlock, _logger);
+        await PerformAssignment(ref validBlocks, fullQuantity: assignment.Quantity, productId, quantityPerBlock: assignment.Item.MaxQuantityPerBlock, _logger);
 
         static ValueTask PerformAssignment(ref Block[] blocks, int fullQuantity, int productId, int quantityPerBlock, ILogger logger)
         {
