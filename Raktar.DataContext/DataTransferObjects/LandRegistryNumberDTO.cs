@@ -2,13 +2,13 @@
 
 namespace Raktar.DataContext.DataTransferObjects
 {
-    class LandRegistryNumberDTO : IAddressDTO
+    public class LandRegistryNumberDTO : IAddressDTO
     {
         public int AddressId { get; set; }
         public SettlementDTO Settlement { get; set; }
         public string Contents { get; set; }
     }
-    class LandRegistryNumberCreateDTO : IAddressCreateDTO
+    public class LandRegistryNumberCreateDTO : IAddressCreateDTO
     {
         [Required]
         public SettlementDTO Settlement { get; set; }
