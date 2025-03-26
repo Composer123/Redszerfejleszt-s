@@ -2,11 +2,17 @@
 {
     public interface IAddressDTO
     {
-        public int AddressId { get; set; }
+        int AddressId { get; set; }
+        string StreetName { get; set; }
+        string City { get; set; }
+        string State { get; set; }
+        string PostalCode { get; set; }
+        string Country { get; set; }
+        SettlementDTO Settlement { get; set; }
     }
 
     public interface IAddressCreateDTO
     {
-        public SettlementDTO Settlement { get; set; }
+        SettlementDTO Settlement { get; set; }
     }
 }
