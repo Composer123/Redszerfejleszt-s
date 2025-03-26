@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Raktar.DataContext;
 
@@ -11,9 +12,11 @@ using Raktar.DataContext;
 namespace Raktar.DataContext.Migrations
 {
     [DbContext(typeof(WarehouseDbContext))]
-    partial class WarehouseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250319190626_GergoInitailation")]
+    partial class GergoInitailation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,11 +58,11 @@ namespace Raktar.DataContext.Migrations
 
             modelBuilder.Entity("Raktar.DataContext.Entities.Block", b =>
                 {
-                    b.Property<int>("BlockId")
+                    b.Property<int>("StorageId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BlockId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StorageId"));
 
                     b.Property<int?>("ProductId")
                         .HasColumnType("int");
@@ -67,7 +70,7 @@ namespace Raktar.DataContext.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.HasKey("BlockId");
+                    b.HasKey("StorageId");
 
                     b.HasIndex("ProductId");
 
@@ -186,7 +189,7 @@ namespace Raktar.DataContext.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductId"));
 
-                    b.Property<int>("MaxQuantityPerBlock")
+                    b.Property<int?>("MaxQuantityPerBlock")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -196,6 +199,9 @@ namespace Raktar.DataContext.Migrations
 
                     b.Property<decimal>("Price")
                         .HasColumnType("money");
+
+                    b.Property<int>("Stock")
+                        .HasColumnType("int");
 
                     b.Property<string>("Type")
                         .IsRequired()

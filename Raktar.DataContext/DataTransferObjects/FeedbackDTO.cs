@@ -6,11 +6,14 @@ namespace Raktar.DataContext.DataTransferObjects
     {
         public int FeedbackId { get; set; }
 
-        public string FeedbackText { get; set; }
+        public string? FeedbackText { get; set; }
+        public byte StarRating { get; set; }
     }
     public class FeedbackCreateDTO
     {
         [Required]
-        public string FeedbackText { get; set; }
+        [Range(0,5)]
+        public byte StarRating { get; set; }
+        public string? FeedbackText { get; set; }
     }
 }

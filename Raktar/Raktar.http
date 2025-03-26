@@ -29,4 +29,18 @@ Content-Type: application/json
   }
 }
 
+
+POST {{Raktar_HostAddress}}/api/feedback/reviews
+Content-Type: application/json
+
+{
+    "StarRating":3,
+    "FeedbackText":"This piece of cardboard I got is faulty as well, it's made of wood."
+}
+
+###
+
+@id=1
+GET {{Raktar_HostAddress}}/api/feedback/reviews/{{id}})
+
 ###
