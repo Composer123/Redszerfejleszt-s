@@ -1,5 +1,4 @@
-﻿
-using System.Text;
+﻿using System.Text;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Raktar.DataContext;
@@ -14,7 +13,7 @@ namespace Raktar.Services
         Task<UserDTO> RegisterAsync(UserRegisterDTO userDto);
         Task<string> LoginAsync(UserLoginDTO userDto);
         Task<UserDTO> UpdateProfileAsync(int userId, UserUpdateDTO userDto);
-        Task<UserDTO> UpdateAddressAsync(int userId, AddressDTO addressDto);
+        Task<UserDTO> UpdateAddressAsync(int userId, SimpleAddressDTO addressDto);
         Task<IList<UserDTO>> GetRolesAsync();
     }
 
@@ -115,7 +114,7 @@ namespace Raktar.Services
             return _mapper.Map<UserDTO>(user);
         }
 
-        public async Task<UserDTO> UpdateAddressAsync(int userId, AddressDTO addressDto)
+        public async Task<UserDTO> UpdateAddressAsync(int userId, SimpleAddressDTO addressDto)
         {
             var user = await _context.Users.Include(u => u.Orders).ThenInclude(o => o.DeliveryAdress).FirstOrDefaultAsync(u => u.UserId == userId);
             if (user == null)
@@ -123,10 +122,14 @@ namespace Raktar.Services
                 throw new KeyNotFoundException("User not found.");
             }
 
-            var address = _mapper.Map<Address>(addressDto);
+            var address = _mapper.Map<Address>(addressDto); // Map to Address instead of SimpleAddress
             var order = user.Orders.FirstOrDefault();
             if (order != null)
             {
+                if ((DateTime.Now - order.OrderDate).TotalHours > 24)
+                {
+                    throw new InvalidOperationException("Cannot update address after 24 hours of order placement.");
+                }
                 order.DeliveryAdress = address;
             }
 
@@ -143,9 +146,6 @@ namespace Raktar.Services
         }
     }
 }
-
-
-//using System.Text;
 
 namespace Raktar.Services
 {
@@ -170,19 +170,5 @@ namespace Raktar.Services
             var hashOfInput = HashPassword(password);
             return StringComparer.OrdinalIgnoreCase.Compare(hashOfInput, hashedPassword) == 0;
         }
-    }
-}
-
-namespace Raktar.DataContext.DataTransferObjects
-{
-    public class AddressDTO
-    {
-        public int AddressId { get; set; }
-        public string StreetName { get; set; }
-        public string City { get; set; }
-        public string State { get; set; }
-        public string PostalCode { get; set; }
-        public string Country { get; set; }
-        public SettlementDTO Settlement { get; set; }
     }
 }

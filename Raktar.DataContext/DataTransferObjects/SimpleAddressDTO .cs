@@ -8,10 +8,7 @@ namespace Raktar.DataContext.DataTransferObjects
         public int AddressId { get; set; }
         public SettlementDTO Settlement { get; set; }
         public string StreetName { get; set; }
-        public string City { get; set; }
-        public string State { get; set; }
-        public string PostalCode { get; set; }
-        public string Country { get; set; }
+
         public PostalStreetType StreetType { get; set; }
         public int HouseNumber { get; set; }
         public int? StairwayNumber { get; set; }
