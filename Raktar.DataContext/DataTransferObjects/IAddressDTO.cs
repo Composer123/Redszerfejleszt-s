@@ -5,7 +5,7 @@
     /// </summary>
     public interface IAddressDTO
     {
-        int AddressId { get; set; }
+        public int AddressId { get; set; }
 
     }
     /// <summary>
@@ -13,6 +13,6 @@
     /// </summary>
     public interface IAddressCreateDTO
     {
-        SettlementDTO Settlement { get; set; }
+        public SettlementDTO Settlement { get; set; }
     }
 }
