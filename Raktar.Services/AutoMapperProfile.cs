@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Raktar.DataContext.Entities;
 using Raktar.DataContext.DataTransferObjects;
 
@@ -13,8 +13,13 @@ namespace Raktar.Services
             CreateMap<UserUpdateDTO, User>();
 
             CreateMap<Address, IAddressDTO>().ReverseMap();
+            CreateMap<Feedback, FeedbackDTO>().ReverseMap();
+            CreateMap<FeedbackCreateDTO, Feedback>();
+
+
             CreateMap<SimpleAddress, SimpleAddressDTO>().ReverseMap();
             CreateMap<LandRegistryNumber, LandRegistryNumberDTO>().ReverseMap();
+
         }
     }
 }
