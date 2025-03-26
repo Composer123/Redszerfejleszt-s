@@ -1,5 +1,33 @@
 @Raktar_HostAddress = https://localhost:7262
 
+@productId=2
+GET {{Raktar_HostAddress}}/api/block/storage/stock/{{productId}}
+
+###
+
+PUT {{Raktar_HostAddress}}/api/block/storage/assign
+Content-Type: application/json
+
+{
+  "Quantity": 90,
+  "Item" : {
+      "ProductId": 2,
+      "MaxQuantityPerBlock": 40
+  }
+}
+
+###
+
+PUT {{Raktar_HostAddress}}/api/block/storage/remove
+Content-Type: application/json
+
+{
+  "Quantity": 45,
+  "Item" : {
+      "ProductId": 2,
+      "MaxQuantityPerBlock": 40
+  }
+}
 
 
 POST {{Raktar_HostAddress}}/api/feedback/reviews

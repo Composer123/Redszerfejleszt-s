@@ -4,6 +4,7 @@ using Raktar.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Logging
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
@@ -16,6 +17,10 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<WarehouseDbContext>();
 
 builder.Services.AddScoped<IAddressService, AddressService>();
+
+// Services
+builder.Services.AddScoped<IBlockService, BlockService>();
+
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
