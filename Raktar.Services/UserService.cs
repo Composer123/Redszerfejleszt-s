@@ -15,6 +15,7 @@ namespace Raktar.Services
         Task<UserDTO> UpdateProfileAsync(int userId, UserUpdateDTO userDto);
         Task<UserDTO> UpdateAddressAsync(int userId, SimpleAddressDTO addressDto);
         Task<IList<UserDTO>> GetRolesAsync();
+        Task<UserDTO> GetUserByIdAsync(int userId);
     }
 
     public class UserService : IUserService
@@ -143,6 +144,17 @@ namespace Raktar.Services
         {
             var users = await _context.Users.Include(u => u.Roles).ToListAsync();
             return _mapper.Map<IList<UserDTO>>(users);
+
+        }
+
+        public async Task<UserDTO> GetUserByIdAsync(int userId) 
+        {
+            var user = await _context.Users.Include(u => u.Roles).FirstOrDefaultAsync(u => u.UserId == userId);
+            if (user == null)
+            {
+                throw new KeyNotFoundException("User not found.");
+            }
+            return _mapper.Map<UserDTO>(user);
         }
     }
 }
