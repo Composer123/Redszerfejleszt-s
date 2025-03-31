@@ -17,6 +17,10 @@ public class BlockController(IBlockService blockService) : ControllerBase
         return Ok(r);
     }
 
+    /// <summary>
+    /// Assign blocks to storage.
+    /// </summary>
+    /// <param name="blockDTO">DTO containing quantity and the item.</param>
     [HttpPut("storage/assign")]
     public async Task<IActionResult> AssignStorage([FromBody] BlockAssignOrRemoveDTO blockDTO)
     {
@@ -34,6 +38,10 @@ public class BlockController(IBlockService blockService) : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Remove a specified amount of item from the storages.
+    /// </summary>
+    /// <param name="removeDTO">DTO containing item and amount.</param>
     [HttpPut("storage/remove")]
     public async Task<IActionResult> RemoveFromStorage([FromBody] BlockAssignOrRemoveDTO removeDTO)
     {
