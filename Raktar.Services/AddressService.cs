@@ -37,17 +37,20 @@ namespace Raktar.Services
             Address address = new();
             await _context.Addresses.AddAsync(address);
 
+            IAddressDTO r = null!;
             switch (createDTO)
             {
                 case SimpleAddressDTO dto:
                     SimpleAddress sa = _mapper.Map<SimpleAddress>(dto);
                     await _context.SimpleAddresses.AddAsync(sa);
+                    r = _mapper.Map<SimpleAddressDTO>(sa);
                     if (_logger.IsEnabled(LogLevel.Debug))
                         _logger.LogDebug("Created address was a simple address.");
                     break;
                 case LandRegistryNumberCreateDTO dto:
                     LandRegistryNumber lrn = _mapper.Map<LandRegistryNumber>(dto);
                     await _context.LandRegistryNumbers.AddAsync(lrn);
+                    r = _mapper.Map<LandRegistryNumberDTO>(lrn);
                     if (_logger.IsEnabled(LogLevel.Debug))
                         _logger.LogDebug("Created address was a land registry number.");
                     break;
@@ -56,7 +59,7 @@ namespace Raktar.Services
             }
 
             await _context.SaveChangesAsync();
-            return _mapper.Map<IAddressDTO>(address);
+            return r;
         }
         /// <exception cref="InvalidOperationException"></exception>
         public async Task<IAddressDTO> GetAddressAsync(int addressId)

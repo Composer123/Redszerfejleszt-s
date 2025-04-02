@@ -1,8 +1,10 @@
-﻿using AutoMapper;
+﻿using System.Text;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Raktar.DataContext;
 using Raktar.DataContext.DataTransferObjects;
 using Raktar.DataContext.Entities;
+using System.Security.Cryptography;
 
 namespace Raktar.Services
 {
@@ -11,10 +13,12 @@ namespace Raktar.Services
         Task<UserDTO> RegisterAsync(UserRegisterDTO userDto);
         Task<string> LoginAsync(UserLoginDTO userDto);
         Task<UserDTO> UpdateProfileAsync(int userId, UserUpdateDTO userDto);
-        //Task<UserDTO> UpdateAddressAsync(int userId, AddressDTO addressDto);
-        //Task<IList<UserDTO>> GetRolesAsync();
+        Task<UserDTO> UpdateAddressAsync(int userId, SimpleAddressDTO addressDto);
+        Task<IList<UserDTO>> GetRolesAsync();
+        Task<UserDTO> GetUserByIdAsync(int userId);
     }
-    class UserService
+
+    public class UserService : IUserService
     {
         private readonly WarehouseDbContext _context;
         private readonly IMapper _mapper;
@@ -22,7 +26,7 @@ namespace Raktar.Services
         public UserService(
             WarehouseDbContext context,
             IMapper mapper
-            )
+        )
         {
             _context = context;
             _mapper = mapper;
@@ -31,7 +35,7 @@ namespace Raktar.Services
         public async Task<UserDTO> RegisterAsync(UserRegisterDTO userDto)
         {
             var user = _mapper.Map<User>(userDto);
-            //user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
+            user.Password = Encoding.UTF8.GetBytes(PasswordHasher.HashPassword(Encoding.UTF8.GetString(userDto.Password)));
             user.Roles = new List<Role>();
 
             if (userDto.Roles != null)
@@ -72,12 +76,12 @@ namespace Raktar.Services
         public async Task<string> LoginAsync(UserLoginDTO userDto)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userDto.Email);
-            if (user == null /*|| !BCrypt.Net.BCrypt.Verify(userDto.Password, user.PasswordHash)*/)
+            if (user == null || !PasswordHasher.VerifyPassword(userDto.Password, Encoding.UTF8.GetString(user.Password)))
             {
                 throw new UnauthorizedAccessException("Invalid credentials.");
             }
 
-            //return _jwtService.GenerateToken(user);
+            // return _jwtService.GenerateToken(user);
             return user.Username;
         }
 
@@ -111,5 +115,72 @@ namespace Raktar.Services
             return _mapper.Map<UserDTO>(user);
         }
 
+        public async Task<UserDTO> UpdateAddressAsync(int userId, SimpleAddressDTO addressDto)
+        {
+            var user = await _context.Users.Include(u => u.Orders).ThenInclude(o => o.DeliveryAdress).FirstOrDefaultAsync(u => u.UserId == userId);
+            if (user == null)
+            {
+                throw new KeyNotFoundException("User not found.");
+            }
+
+            var address = _mapper.Map<Address>(addressDto); // Map to Address instead of SimpleAddress
+            var order = user.Orders.FirstOrDefault();
+            if (order != null)
+            {
+                if ((DateTime.Now - order.OrderDate).TotalHours > 24)
+                {
+                    throw new InvalidOperationException("Cannot update address after 24 hours of order placement.");
+                }
+                order.DeliveryAdress = address;
+            }
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<UserDTO>(user);
+        }
+
+        public async Task<IList<UserDTO>> GetRolesAsync()
+        {
+            var users = await _context.Users.Include(u => u.Roles).ToListAsync();
+            return _mapper.Map<IList<UserDTO>>(users);
+
+        }
+
+        public async Task<UserDTO> GetUserByIdAsync(int userId) 
+        {
+            var user = await _context.Users.Include(u => u.Roles).FirstOrDefaultAsync(u => u.UserId == userId);
+            if (user == null)
+            {
+                throw new KeyNotFoundException("User not found.");
+            }
+            return _mapper.Map<UserDTO>(user);
+        }
+    }
+}
+
+namespace Raktar.Services
+{
+    public static class PasswordHasher
+    {
+        public static string HashPassword(string password)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                var builder = new StringBuilder();
+                foreach (var b in bytes)
+                {
+                    builder.Append(b.ToString("x2"));
+                }
+                return builder.ToString();
+            }
+        }
+
+        public static bool VerifyPassword(string password, string hashedPassword)
+        {
+            var hashOfInput = HashPassword(password);
+            return StringComparer.OrdinalIgnoreCase.Compare(hashOfInput, hashedPassword) == 0;
+        }
     }
 }
