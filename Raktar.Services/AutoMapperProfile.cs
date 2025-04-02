@@ -19,7 +19,12 @@ namespace Raktar.Services
 
             CreateMap<SimpleAddress, SimpleAddressDTO>().ReverseMap();
             CreateMap<LandRegistryNumber, LandRegistryNumberDTO>().ReverseMap();
+            
+            CreateMap<Product, ProductDTO>().ReverseMap();
+            CreateMap<ProductCreateDTO, Product>();
 
+            CreateMap<Order, OrderDTO>().ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+            CreateMap<OrderCreateDTO, Order>();
         }
     }
 }
