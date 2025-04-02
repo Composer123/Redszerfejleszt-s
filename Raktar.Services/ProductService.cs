@@ -2,20 +2,13 @@
 using Raktar.DataContext;
 using Raktar.DataContext.DataTransferObjects;
 using Raktar.DataContext.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Raktar.DataContext.DataTransferObjects.ProductServiceDTO;
-
 
 namespace Raktar.Services
 {
     public interface IProductService
     {
-            Task<ProductDTO> CreateProductAsync( ProductCreateDTO productCreateDTO);
-            Task<ProductDTO> GetProductByIdAsync(int id);
+        Task<ProductDTO> CreateProductAsync(ProductCreateDTO productCreateDTO);
+        Task<ProductDTO> GetProductByIdAsync(int id);
     }
     public class ProductService : IProductService
     {

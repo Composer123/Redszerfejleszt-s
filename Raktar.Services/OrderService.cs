@@ -2,11 +2,6 @@
 using Raktar.DataContext.DataTransferObjects;
 using Raktar.DataContext.Entities;
 using Raktar.DataContext;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Raktar.Services
 {
