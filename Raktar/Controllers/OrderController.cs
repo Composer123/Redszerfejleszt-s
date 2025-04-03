@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Raktar.DataContext.DataTransferObjects;
+using Raktar.DataContext.Entities;
 using Raktar.Services;
 
 namespace Raktar.Controllers
@@ -36,6 +37,24 @@ namespace Raktar.Controllers
             {
                 return NotFound($"Order with ID {id} not found.");
             }
+        }
+
+        [HttpPut("delivery/{id}")]
+        public async Task<IActionResult> ChangeOrderStatus(int id)
+        {
+            bool succes = await _orderService.ChangeStatusAsync(id, OrderStatus.Delivered);
+
+            if (!succes)
+                return NotFound($"Order with ID {id} not found.");
+
+            return Ok();
+        }
+
+        [HttpGet("delivery")]
+        public async Task<IActionResult> GetUndeliveredOrders()
+        {
+            var r = await _orderService.GetOrdersUndeliveredAsync();
+            return Ok(r);
         }
     }
 }

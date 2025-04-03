@@ -2,6 +2,7 @@
 using Raktar.DataContext.DataTransferObjects;
 using Raktar.DataContext.Entities;
 using Raktar.DataContext;
+using Microsoft.EntityFrameworkCore;
 
 namespace Raktar.Services
 {
@@ -9,6 +10,8 @@ namespace Raktar.Services
     {
         Task<OrderDTO> CreateOrderAsync(OrderCreateDTO orderCreateDTO);
         Task<OrderDTO> GetOrderByIdAsync(int id);
+        Task<bool> ChangeStatusAsync(int orderId, OrderStatus status);
+        Task<IEnumerable<OrderDTO>> GetOrdersUndeliveredAsync();
     }
     public class OrderService : IOrderService
     {
@@ -42,6 +45,27 @@ namespace Raktar.Services
             }
 
             return _mapper.Map<OrderDTO>(order);
+        }
+
+        public async Task<bool> ChangeStatusAsync(int orderId, OrderStatus status)
+        {
+            Order? order = await _context.Orders.FindAsync(orderId);
+            if (order is null)
+                return false;
+
+            order.Status = status;
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<IEnumerable<OrderDTO>> GetOrdersUndeliveredAsync()
+        {
+            return 
+                await _context.Orders
+                .Where(o => o.Status == OrderStatus.ReadyForDelivery)
+                .Select(o => _mapper.Map<OrderDTO>(o))
+                .ToListAsync();
         }
     }
 }
