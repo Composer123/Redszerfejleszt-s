@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Raktar.Services;
-using static Raktar.DataContext.DataTransferObjects.ProductServiceDTO;
+using Raktar.DataContext.DataTransferObjects;
 
 namespace Raktar.Controllers
 {
