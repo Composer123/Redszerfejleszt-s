@@ -25,6 +25,12 @@ namespace Raktar.Services
 
             CreateMap<Order, OrderDTO>().ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
             CreateMap<OrderCreateDTO, Order>();
+
+            CreateMap<Role, RoleDTO>();
+            CreateMap<User, UserDTO>()
+            .ForMember(dest => dest.Password, opt => opt.Ignore())  // don't expose the password
+            .ForMember(dest => dest.Orders, opt => opt.Ignore()); // ignore orders to avoid cycles
+
         }
     }
 }
