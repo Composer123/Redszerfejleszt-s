@@ -11,6 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Authorization;
+using System.Linq;
 
 namespace Raktar.Services
 {
@@ -85,10 +86,13 @@ namespace Raktar.Services
 
         public async Task<string> LoginAsync(UserLoginDTO userDto)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userDto.Email);
-            if (user == null)
+            var user = await _context.Users
+            .Include(u => u.Roles)
+            .FirstOrDefaultAsync(x => x.Email == userDto.Email);
+
+            if (user == null || !user.Roles.Any())
             {
-                throw new UnauthorizedAccessException("Invalid credentials.");
+                throw new UnauthorizedAccessException("Invalid credentials or missing roles.");
             }
 
             // Convert the stored byte[] (e.g., 0x70617373776F7264) to string ("password")
@@ -158,7 +162,7 @@ namespace Raktar.Services
             return _mapper.Map<UserDTO>(user);
         }
 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IList<UserDTO>> GetRolesAsync()
         {
             var users = await _context.Users.Include(u => u.Roles).ToListAsync();

@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Raktar.DataContext.DataTransferObjects;
@@ -19,6 +20,7 @@ namespace Raktar.Controllers
         }
 
         [HttpPost("register")]
+        [AllowAnonymous]
         public async Task<IActionResult> Register(UserRegisterDTO userDto)
         {
             var user = await _userService.RegisterAsync(userDto);
@@ -34,6 +36,7 @@ namespace Raktar.Controllers
         }
 
         [HttpPut("{userId}/profile")]
+        [AllowAnonymous]
         public async Task<IActionResult> UpdateProfile(int userId, UserUpdateDTO userDto)
         {
             var user = await _userService.UpdateProfileAsync(userId, userDto);
@@ -41,6 +44,7 @@ namespace Raktar.Controllers
         }
 
         [HttpPut("{userId}/address")]
+        [AllowAnonymous]
         public async Task<IActionResult> UpdateAddress(int userId, SimpleAddressDTO addressDto)
         {
             var user = await _userService.UpdateAddressAsync(userId, addressDto);
@@ -48,6 +52,7 @@ namespace Raktar.Controllers
         }
 
         [HttpGet("roles")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetRoles()
         {
             var roles = await _userService.GetRolesAsync();
@@ -55,6 +60,7 @@ namespace Raktar.Controllers
         }
 
         [HttpGet("{id}")]
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetUserById(int id)
         {
