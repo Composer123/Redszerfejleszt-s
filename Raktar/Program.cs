@@ -23,7 +23,7 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<WarehouseDbContext>(options =>
 {
-    options.UseSqlServer("Server=GERGO\\MSSQLSERVER01;Database=WarehouseDB;Trusted_Connection=True;TrustServerCertificate=True;");
+    options.UseSqlServer("Server=localhost;MSSQLSERVER01;Database=WarehouseDB;Trusted_Connection=True;TrustServerCertificate=True;");
 });
 
 // Services

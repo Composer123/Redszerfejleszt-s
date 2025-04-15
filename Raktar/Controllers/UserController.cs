@@ -19,6 +19,7 @@ namespace Raktar.Controllers
         }
 
         [HttpPost("register")]
+        [AllowAnonymous]
         public async Task<IActionResult> Register(UserRegisterDTO userDto)
         {
             var user = await _userService.RegisterAsync(userDto);
@@ -34,6 +35,10 @@ namespace Raktar.Controllers
         }
 
         [HttpPut("{userId}/profile")]
+        [Authorize(Roles = "Customer")]
+        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Suppiler")]
+        [Authorize(Roles = "Transporter")]
         public async Task<IActionResult> UpdateProfile(int userId, UserUpdateDTO userDto)
         {
             var user = await _userService.UpdateProfileAsync(userId, userDto);
@@ -41,6 +46,10 @@ namespace Raktar.Controllers
         }
 
         [HttpPut("{userId}/address")]
+        [Authorize(Roles = "Customer")]
+        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Suppiler")]
+        [Authorize(Roles = "Transporter")]
         public async Task<IActionResult> UpdateAddress(int userId, SimpleAddressDTO addressDto)
         {
             var user = await _userService.UpdateAddressAsync(userId, addressDto);
@@ -48,6 +57,10 @@ namespace Raktar.Controllers
         }
 
         [HttpGet("roles")]
+        [Authorize(Roles = "Customer")]
+        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Suppiler")]
+        [Authorize(Roles = "Transporter")]
         public async Task<IActionResult> GetRoles()
         {
             var roles = await _userService.GetRolesAsync();
@@ -55,7 +68,10 @@ namespace Raktar.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Customer")]
         [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Suppiler")]
+        [Authorize(Roles = "Transporter")]
         public async Task<IActionResult> GetUserById(int id)
         {
             var user = await _userService.GetUserByIdAsync(id);

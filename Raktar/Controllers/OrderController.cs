@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Raktar.DataContext.DataTransferObjects;
 using Raktar.DataContext.Entities;
 using Raktar.Services;
@@ -6,7 +7,9 @@ using Raktar.Services;
 namespace Raktar.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
+
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _orderService;
@@ -18,6 +21,7 @@ namespace Raktar.Controllers
 
         // POST: api/order
         [HttpPost]
+        [Authorize(Roles = "Customer")]
         public async Task<ActionResult<OrderDTO>> CreateOrder([FromBody] OrderCreateDTO orderCreateDTO)
         {
             var newOrder = await _orderService.CreateOrderAsync(orderCreateDTO);
@@ -26,6 +30,7 @@ namespace Raktar.Controllers
 
         // GET: api/order/5
         [HttpGet("{id}")]
+        [Authorize(Roles = "Customer")]
         public async Task<ActionResult<OrderDTO>> GetOrderById(int id)
         {
             try
@@ -40,6 +45,7 @@ namespace Raktar.Controllers
         }
 
         [HttpPut("delivery/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ChangeOrderStatus(int id)
         {
             bool succes = await _orderService.ChangeStatusAsync(id, OrderStatus.Delivered);
@@ -51,6 +57,7 @@ namespace Raktar.Controllers
         }
 
         [HttpGet("delivery")]
+        [Authorize(Roles = "Customer")]
         public async Task<IActionResult> GetUndeliveredOrders()
         {
             var r = await _orderService.GetOrdersUndeliveredAsync();

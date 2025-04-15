@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Raktar.Services;
 using Raktar.DataContext.DataTransferObjects;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Raktar.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
@@ -17,6 +19,7 @@ namespace Raktar.Controllers
 
         // POST: api/product
         [HttpPost]
+        [Authorize(Roles = "Admin")] 
         public async Task<ActionResult<ProductDTO>> CreateProduct([FromBody] ProductCreateDTO productCreateDTO)
         {
             var newProduct = await _productService.CreateProductAsync(productCreateDTO);
@@ -25,6 +28,7 @@ namespace Raktar.Controllers
 
         // GET: api/product/5
         [HttpGet("{id}")]
+        [Authorize(Roles = "Customer")]
         public async Task<ActionResult<ProductDTO>> GetProductById(int id)
         {
             try
