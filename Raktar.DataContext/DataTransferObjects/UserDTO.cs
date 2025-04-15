@@ -17,7 +17,7 @@ namespace Raktar.DataContext.DataTransferObjects
 
         public ICollection<Order> Orders { get; set; }
 
-        public ICollection<Role> Roles { get; set; }
+        public ICollection<RoleDTO> Roles { get; set; }
     }
 
     public class UserRegisterDTO
