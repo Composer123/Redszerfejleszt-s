@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Raktar.DataContext.DataTransferObjects;
 using Raktar.Services;
 
@@ -6,6 +7,7 @@ namespace Raktar.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class FeedbackController : ControllerBase
     {
         private readonly IFeedbackService _feedbackService;
@@ -16,6 +18,7 @@ namespace Raktar.Controllers
         }
 
         [HttpGet("reviews/{id})")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetFeedbackById(int id)
         {
             var feedback = await _feedbackService.GetFeedbackIdAsync(id);
@@ -24,6 +27,7 @@ namespace Raktar.Controllers
 
 
         [HttpPost("reviews")]
+        [Authorize(Roles = "Customer")]
         public async Task<IActionResult> PostReview([FromBody] FeedbackCreateDTO feedbackDTO)
         {
             var feedback = await _feedbackService.CreateFeedbackAsync(feedbackDTO);
