@@ -146,7 +146,10 @@ namespace Raktar.Services
             }
 
             var address = _mapper.Map<Address>(addressDto); // Map to Address instead of SimpleAddress
-            var order = user.Orders.FirstOrDefault();
+            var order = user.Orders
+                .OrderByDescending(o => o.OrderDate)
+                .FirstOrDefault();
+            
             if (order != null)
             {
                 if ((DateTime.Now - order.OrderDate).TotalHours > 24)

@@ -44,13 +44,20 @@ namespace Raktar.Controllers
         }
 
         [HttpPut("delivery/{id}")]
-        [AllowAnonymous] //Kellene validálni hogy a felhasználó csak "canceled"-d státuszt állítson be?
-        public async Task<IActionResult> ChangeOrderStatus(int id)
+        [Authorize]
+        public async Task<IActionResult> ChangeOrderStatus(int id, [FromBody] OrderStatus newStatus)
         {
-            bool succes = await _orderService.ChangeStatusAsync(id, OrderStatus.Delivered);
+            // If the logged-in user has the role "Customer", they are only allowed to cancel orders.
+            if (User.IsInRole("Customer") && newStatus != OrderStatus.Cancelled)
+            {
+                return Forbid("Users with the 'User' role can only cancel orders.");
+            }
 
-            if (!succes)
-                return NotFound($"Order with ID {id} not found.");
+            bool success = await _orderService.ChangeStatusAsync(id, newStatus);
+            if (!success)
+            {
+                return NotFound($"Order with ID {id} was not found.");
+            }
 
             return Ok();
         }
