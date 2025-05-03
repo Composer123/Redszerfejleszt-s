@@ -44,9 +44,16 @@ namespace Raktar.Services
 
         public async Task<UserDTO> RegisterAsync(UserRegisterDTO userDto)
         {
+            // Map the incoming DTO to your User entity.
             var user = _mapper.Map<User>(userDto);
-            user.Password = Encoding.UTF8.GetBytes(PasswordHasher.HashPassword(Encoding.UTF8.GetString(userDto.Password)));
+
+            // Since the password is now a plain string in your DTO,
+            // directly convert it to a byte[] and store it.
+            user.Password = Encoding.UTF8.GetBytes(userDto.Password);
+
+            // Process roles.
             user.Roles = new List<Role>();
+
 
             if (userDto.Roles != null)
             {

@@ -1,6 +1,7 @@
 using AutoMapper;
 using Raktar.DataContext.Entities;
 using Raktar.DataContext.DataTransferObjects;
+using System.Text;
 
 namespace Raktar.Services
 {
@@ -30,6 +31,13 @@ namespace Raktar.Services
             CreateMap<User, UserDTO>()
             .ForMember(dest => dest.Password, opt => opt.Ignore())  // don't expose the password
             .ForMember(dest => dest.Orders, opt => opt.Ignore()); // ignore orders to avoid cycles
+
+            CreateMap<Role, RoleDTO>().ReverseMap();
+
+            // Mapping from UserRegisterDTO (with a string Password) to User.
+            // This converts the string to a byte array when storing the password.
+            CreateMap<UserRegisterDTO, User>()
+                .ForMember(dest => dest.Password, opt => opt.MapFrom(src => Encoding.UTF8.GetBytes(src.Password)));
 
         }
     }

@@ -22,7 +22,7 @@ namespace Raktar.DataContext.DataTransferObjects
 
     public class UserRegisterDTO
     {
-        [Phone]
+        
         public int TelephoneNumber { get; set; }
 
         [Required]
@@ -35,7 +35,8 @@ namespace Raktar.DataContext.DataTransferObjects
 
         [Required]
         [MinLength(6)]
-        public byte[] Password { get; set; }
+        //The Register method changes its value to byte[]
+        public string Password { get; set; }
         public ICollection<RoleDTO> Roles { get; set; }
     }
     public class UserLoginDTO
