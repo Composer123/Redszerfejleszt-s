@@ -33,7 +33,7 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 // Add JWT Authentication
-JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // Remove default claims
+//JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // Remove default claims
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // => remove default claims
 builder.Services
     .AddAuthentication(options =>
