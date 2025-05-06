@@ -69,6 +69,8 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("TransporterPolicy", policy => policy.RequireRole("Transporter"));
 });
 
+builder.Services.AddCors();
+
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 // Swagger configuration
