@@ -2,6 +2,7 @@
 using Raktar.DataContext;
 using Raktar.DataContext.DataTransferObjects;
 using Raktar.DataContext.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Raktar.Services
 {
@@ -9,6 +10,7 @@ namespace Raktar.Services
     {
         Task<ProductDTO> CreateProductAsync(ProductCreateDTO productCreateDTO);
         Task<ProductDTO> GetProductByIdAsync(int id);
+        Task<IEnumerable<ProductDTO>> GetAllProductsAsync();
     }
     public class ProductService : IProductService
     {
@@ -38,6 +40,20 @@ namespace Raktar.Services
             }
 
             return _mapper.Map<ProductDTO>(product);
+        }
+
+        public async Task<IEnumerable<ProductDTO>> GetAllProductsAsync()
+        {
+            return await _context.Products
+                .Select(p => new ProductDTO
+                {
+                    ProductId = p.ProductId,
+                    Name = p.Name,
+                    Type = p.Type,
+                    Price = p.Price,
+                    MaxQuantityPerBlock = p.MaxQuantityPerBlock
+                })
+                .ToListAsync();
         }
     }
 }

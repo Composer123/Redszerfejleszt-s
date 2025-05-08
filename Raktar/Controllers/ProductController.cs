@@ -41,5 +41,14 @@ namespace Raktar.Controllers
                 return NotFound($"Product with ID {id} not found.");
             }
         }
+
+        // GET: api/product - Allow anonymous users to get all products
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAllProducts()
+        {
+            var products = await _productService.GetAllProductsAsync();
+            return Ok(products);
+        }
     }
 }

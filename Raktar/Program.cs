@@ -22,6 +22,7 @@ builder.Services.AddOpenApi(); // Swagger configuration
 builder.Services.AddDbContext<WarehouseDbContext>(options =>
 {
     options.UseSqlServer("Server=GERGO\\MSSQLSERVER01;Database=Warehouse;Trusted_Connection=True;TrustServerCertificate=True;");
+    //options.UseSqlServer("localhost;Database=Warehouse;Trusted_Connection=True;TrustServerCertificate=True;");
 });
 
 // Register services
