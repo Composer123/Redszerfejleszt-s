@@ -27,6 +27,7 @@ public partial class WarehouseDbContext : DbContext
     public virtual DbSet<LandRegistryNumber> LandRegistryNumbers { get; set; }
 
     public virtual DbSet<Order> Orders { get; set; }
+    public virtual DbSet<OrderItem> OrderItems { get; set; }
 
     public virtual DbSet<Product> Products { get; set; }
 

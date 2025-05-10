@@ -9,8 +9,9 @@ namespace Raktar.Services
     public interface IOrderService
     {
         Task<OrderDTO> CreateOrderAsync(OrderCreateDTO orderCreateDTO);
+        Task<OrderDTO> AddItemToOrderAsync(int orderId,AddOrderItemDTO dto);
         Task<OrderDTO> GetOrderByIdAsync(int id);
-        Task<bool> ChangeStatusAsync(int orderId, OrderStatus status);
+        Task<bool> ChangeStatusAsync(int orderId, IOrderStatusDTO status);
         Task<IEnumerable<OrderDTO>> GetOrdersUndeliveredAsync();
     }
     public class OrderService : IOrderService
@@ -36,6 +37,20 @@ namespace Raktar.Services
             return _mapper.Map<OrderDTO>(order);
         }
 
+        public async Task<OrderDTO> AddItemToOrderAsync(int orderId,AddOrderItemDTO dto)
+        {
+            Product product = await _context.Products.FindAsync(dto.ProductId)
+                ?? throw new KeyNotFoundException($"Product not found with id {dto.ProductId}.");
+            Order order = await _context.Orders.FindAsync(orderId)
+                ?? throw new KeyNotFoundException($"Order not found with id {orderId}.");
+
+            OrderItem orderItem = _mapper.Map<OrderItem>(dto);
+            await _context.OrderItems.AddAsync(orderItem);
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<OrderDTO>(order);
+        }
+
         public async Task<OrderDTO> GetOrderByIdAsync(int id)
         {
             var order = await _context.Orders.FindAsync(id);
@@ -47,13 +62,16 @@ namespace Raktar.Services
             return _mapper.Map<OrderDTO>(order);
         }
 
-        public async Task<bool> ChangeStatusAsync(int orderId, OrderStatus status)
+        public async Task<bool> ChangeStatusAsync(int orderId, IOrderStatusDTO status)
         {
             Order? order = await _context.Orders.FindAsync(orderId);
             if (order is null)
                 return false;
 
-            order.Status = status;
+            order.Status = status.OrderStatus;
+            if (status is OrderStatusDelliveryAcceptDTO dellivery)
+                order.DeliveryDate = dellivery.DelliveryDate;
+
             await _context.SaveChangesAsync();
 
             return true;

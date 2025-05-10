@@ -12,7 +12,7 @@ namespace Raktar.Controllers
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _orderService;
-        
+
         public OrderController(IOrderService orderService)
         {
             _orderService = orderService;
@@ -25,6 +25,13 @@ namespace Raktar.Controllers
         {
             var newOrder = await _orderService.CreateOrderAsync(orderCreateDTO);
             return CreatedAtAction(nameof(GetOrderById), new { id = newOrder.OrderId }, newOrder);
+        }
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Customer")]
+        public async Task<ActionResult<OrderDTO>> AddToOrder([FromRoute] int id, [FromBody] AddOrderItemDTO addOrderItemDTO)
+        {
+            var order = await _orderService.AddItemToOrderAsync(id, addOrderItemDTO);
+            return Ok(order);
         }
 
         // GET: api/order/5
@@ -45,10 +52,10 @@ namespace Raktar.Controllers
 
         [HttpPut("delivery/{id}")]
         [Authorize]
-        public async Task<IActionResult> ChangeOrderStatus(int id, [FromBody] OrderStatus newStatus)
+        public async Task<IActionResult> ChangeOrderStatus(int id, [FromBody] IOrderStatusDTO newStatus)
         {
             // If the logged-in user has the role "Customer", they are only allowed to cancel orders.
-            if (User.IsInRole("Customer") && newStatus != OrderStatus.Cancelled)
+            if (User.IsInRole("Customer") && newStatus is not OrderCancelStatusDTO)
             {
                 return Forbid("Users with the 'User' role can only cancel orders.");
             }
