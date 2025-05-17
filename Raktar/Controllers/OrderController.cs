@@ -76,5 +76,34 @@ namespace Raktar.Controllers
             var r = await _orderService.GetOrdersUndeliveredAsync();
             return Ok(r);
         }
+
+        [HttpGet("delivery/user/{userId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetUndeliveredOrdersByUserId(int userId)
+        {
+            // Ensure the logged-in user can only fetch their own orders (unless admin)
+            if (User.IsInRole("Customer") && userId.ToString() != User.Identity?.Name)
+            {
+                return Forbid("You can only view your own undelivered orders.");
+            }
+
+            var orders = await _orderService.GetUndeliveredOrdersByUserIdAsync(userId);
+            return Ok(orders);
+        }
+
+        [HttpGet("user/{userId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetOrdersByUserId(int userId)
+        {
+            // Ensure customers can only fetch their own orders unless they are an admin
+            if (User.IsInRole("Customer") && userId.ToString() != User.Identity?.Name)
+            {
+                return Forbid("You can only view your own orders.");
+            }
+
+            var orders = await _orderService.GetOrdersByUserIdAsync(userId);
+            return Ok(orders);
+        }
+
     }
 }
