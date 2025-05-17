@@ -78,11 +78,12 @@ namespace Raktar.Controllers
         }
 
         [HttpGet("delivery/user/{userId}")]
-        [AllowAnonymous]
+        [Authorize] // Use [Authorize] if you require a valid token
         public async Task<IActionResult> GetUndeliveredOrdersByUserId(int userId)
         {
-            // Ensure the logged-in user can only fetch their own orders (unless admin)
-            if (User.IsInRole("Customer") && userId.ToString() != User.Identity?.Name)
+            // Extract the numeric user ID from the token's claims
+            string claimUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (User.IsInRole("Customer") && userId.ToString() != claimUserId)
             {
                 return Forbid("You can only view your own undelivered orders.");
             }
@@ -92,11 +93,11 @@ namespace Raktar.Controllers
         }
 
         [HttpGet("user/{userId}")]
-        [AllowAnonymous]
+        [Authorize]
         public async Task<IActionResult> GetOrdersByUserId(int userId)
         {
-            // Ensure customers can only fetch their own orders unless they are an admin
-            if (User.IsInRole("Customer") && userId.ToString() != User.Identity?.Name)
+            string claimUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (User.IsInRole("Customer") && userId.ToString() != claimUserId)
             {
                 return Forbid("You can only view your own orders.");
             }
