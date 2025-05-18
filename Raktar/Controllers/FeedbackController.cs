@@ -14,7 +14,6 @@ namespace Raktar.Controllers
 
         public FeedbackController(IUserService userService, IFeedbackService feedbackService)
         {
-            _userService = userService;
             _feedbackService = feedbackService;
         }
 
