@@ -25,7 +25,8 @@ namespace Raktar.Services
             CreateMap<ProductCreateDTO, Product>();
 
             CreateMap<Order, OrderDTO>().ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
-            CreateMap<OrderCreateDTO, Order>();
+            CreateMap<OrderCreateDTO, Order>().ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems));
+            CreateMap<AddOrderItemDTO, OrderItem>();
 
             CreateMap<Role, RoleDTO>();
             CreateMap<User, UserDTO>()
