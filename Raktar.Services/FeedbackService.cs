@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Raktar.DataContext;
 using Raktar.DataContext.DataTransferObjects;
 using Raktar.DataContext.Entities;
@@ -40,6 +41,11 @@ namespace Raktar.Services
                 throw new KeyNotFoundException("Feedback not found.");
             }
             return _mapper.Map<FeedbackDTO>(feedback);
+        }
+        public async Task<IList<FeedbackDTO>> GetAllFeedbacksAsync()
+        {
+            var feedbacks = await _context.Feedbacks.ToListAsync();
+            return _mapper.Map<IList<FeedbackDTO>>(feedbacks);
         }
     }
 }

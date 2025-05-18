@@ -222,11 +222,7 @@ namespace Raktar.Services
 
             return new ClaimsIdentity(claims, "Token");
         }
-        public async Task<IList<FeedbackDTO>> GetAllFeedbacksAsync()
-        {
-            var feedbacks = await _context.Feedbacks.ToListAsync();
-            return _mapper.Map<IList<FeedbackDTO>>(feedbacks);
-        }
+
 
     }
 }
