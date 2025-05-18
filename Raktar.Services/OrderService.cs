@@ -75,14 +75,14 @@ namespace Raktar.Services
             if (order is null)
                 return false;
 
-            // 1. Validáció: ne lehessen nulla termék
-            if (order.OrderItems == null || !order.OrderItems.Any())
-                throw new InvalidOperationException("Order must contain at least one product.");
+            //// 1. Validáció: ne lehessen nulla termék
+            //if (order.OrderItems == null || !order.OrderItems.Any())
+            //    throw new InvalidOperationException("Order must contain at least one product.");
 
-            // 2. Validáció: csak bizonyos státuszok engedélyezettek
-            var allowedStatuses = new[] { OrderStatus.Delivered, OrderStatus.Cancelled, OrderStatus.Undeliverible };
-            if (!allowedStatuses.Contains(status.OrderStatus))
-                throw new InvalidOperationException("Only Delivered, Cancelled, or Undeliverible statuses are allowed.");
+            //// 2. Validáció: csak bizonyos státuszok engedélyezettek
+            //var allowedStatuses = new[] { OrderStatus.Delivered, OrderStatus.Cancelled, OrderStatus.Undeliverible };
+            //if (!allowedStatuses.Contains(status.OrderStatus))
+            //    throw new InvalidOperationException("Only Delivered, Cancelled, or Undeliverible statuses are allowed.");
 
             order.Status = status.OrderStatus;
             if (status.DelliveryDate is not null)

@@ -63,11 +63,25 @@ namespace Raktar.Controllers
         [Authorize]
         public async Task<IActionResult> ChangeOrderStatus(int id, [FromBody] OrderStatusDTO newStatus)
         {
+
             // If the logged-in user has the role "Customer", they are only allowed to cancel orders.
-            if (User.IsInRole("Customer") && (newStatus.OrderStatus != OrderStatus.Cancelled || newStatus.DelliveryDate is not null))
+            if (!(User.IsInRole("Admin")))
             {
-                return Forbid("Users with the 'User' role can only cancel orders.");
+                if (User.IsInRole("Customer") && (newStatus.OrderStatus != OrderStatus.Cancelled || newStatus.DelliveryDate is not null))
+                {
+                    return Forbid("Users with the 'User' role can only cancel orders.");
+                }
+                if (User.IsInRole("Transporter") && (newStatus.OrderStatus != OrderStatus.Delivered || newStatus.OrderStatus != OrderStatus.Cancelled || newStatus.OrderStatus != OrderStatus.Undeliverible || newStatus.DelliveryDate is not null))
+                {
+                    return Forbid("Users with the 'Transporter' role cannot set that status.");
+                }
+                if (User.IsInRole("Supplier") && (newStatus.OrderStatus != OrderStatus.ReadyForDelivery || newStatus.OrderStatus != OrderStatus.Cancelled || newStatus.OrderStatus != OrderStatus.Undeliverible || newStatus.DelliveryDate is not null))
+                {
+                    return Forbid("Users with the 'Transporter' role cannot set that status.");
+                }
+
             }
+           
 
             bool success = await _orderService.ChangeStatusAsync(id, newStatus);
             if (!success)
