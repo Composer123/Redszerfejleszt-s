@@ -47,19 +47,20 @@ public class BlockService(WarehouseDbContext context, ILogger<IBlockService> log
     {
         ArgumentNullException.ThrowIfNull(assignment);
 
-        int productId = assignment.Item.ProductId;
-        if (await _context.Products.FindAsync(productId) == null)
-            throw new InvalidOperationException($"Couldn't find given product #{assignment.Item.ProductId}");
+        int productId = assignment.ProductId;
+        Product? product = await _context.Products.FindAsync(productId);
+        if (product is null)
+            throw new InvalidOperationException($"Couldn't find given product #{assignment.ProductId}");
 
         Block[] validBlocks = await _context.Blocks
             .Where(b => b.ProductId == productId || b.ProductId == null)
             .ToArrayAsync();
 
-        int maxCapacity = assignment.Item.MaxQuantityPerBlock * validBlocks.Length - validBlocks.Sum(b => b.Quantity);
+        int maxCapacity = product.MaxQuantityPerBlock * validBlocks.Length - validBlocks.Sum(b => b.Quantity);
         if (assignment.Quantity > maxCapacity)
             return false;
 
-        await PerformAssignment(ref validBlocks, fullQuantity: assignment.Quantity, productId, quantityPerBlock: assignment.Item.MaxQuantityPerBlock, _logger);
+        await PerformAssignment(ref validBlocks, fullQuantity: assignment.Quantity, productId, quantityPerBlock: product.MaxQuantityPerBlock, _logger);
 
         static ValueTask PerformAssignment(ref Block[] blocks, int fullQuantity, int productId, int quantityPerBlock, ILogger logger)
         {
@@ -92,15 +93,19 @@ public class BlockService(WarehouseDbContext context, ILogger<IBlockService> log
     {
         ArgumentNullException.ThrowIfNull(removeDTO);
 
+        Product? product = await _context.Products.FindAsync(removeDTO.ProductId);
+        if (product is null)
+            return false;
+
         Block[] validBlocks = await _context.Blocks
-            .Where(b => b.ProductId == removeDTO.Item.ProductId)
+            .Where(b => b.ProductId == removeDTO.ProductId)
             .ToArrayAsync();
 
         int stock = validBlocks.Sum(b => b.Quantity);
         if (stock < removeDTO.Quantity)
             return false;
 
-        await PerformRemoval(ref validBlocks, fullQuantity: removeDTO.Quantity, quantityPerBlock: removeDTO.Item.MaxQuantityPerBlock, _logger);
+        await PerformRemoval(ref validBlocks, fullQuantity: removeDTO.Quantity, quantityPerBlock: product.MaxQuantityPerBlock, _logger);
 
         static ValueTask PerformRemoval(ref Block[] blocks, int fullQuantity, int quantityPerBlock, ILogger logger)
         {
