@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Raktar.DataContext.Entities;
 
@@ -7,7 +8,9 @@ public partial class User
 {
     public int UserId { get; set; }
 
-    public int TelephoneNumber { get; set; }
+    [Phone]
+    [MaxLength(16)]
+    public string TelephoneNumber { get; set; }
 
     public string Email { get; set; }
 
