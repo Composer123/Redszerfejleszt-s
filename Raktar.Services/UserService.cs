@@ -23,7 +23,6 @@ namespace Raktar.Services
         Task<UserDTO> UpdateAddressAsync(int userId, SimpleAddressDTO addressDto);
         Task<IList<UserDTO>> GetRolesAsync();
         Task<UserDTO> GetUserByIdAsync(int userId);
-        Task<IList<FeedbackDTO>> GetAllFeedbacksAsync();
     }
 
     public class UserService : IUserService

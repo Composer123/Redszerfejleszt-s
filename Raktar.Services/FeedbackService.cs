@@ -10,6 +10,7 @@ namespace Raktar.Services
     {
         Task<FeedbackDTO> CreateFeedbackAsync(FeedbackCreateDTO feedbackCreate);
         Task<FeedbackDTO> GetFeedbackIdAsync(int id);
+        Task<IList<FeedbackDTO>> GetAllFeedbacksAsync();
     }
 
     public class FeedbackService : IFeedbackService
