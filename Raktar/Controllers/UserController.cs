@@ -61,7 +61,8 @@ namespace Raktar.Controllers
 
         [HttpGet("{id}")]
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> GetUserById(int id)
         {
             var user = await _userService.GetUserByIdAsync(id);

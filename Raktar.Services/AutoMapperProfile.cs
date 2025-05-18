@@ -11,7 +11,9 @@ namespace Raktar.Services
         {
             CreateMap<User, UserDTO>().ReverseMap();
             CreateMap<UserRegisterDTO, User>();
-            CreateMap<UserUpdateDTO, User>();
+            CreateMap<UserUpdateDTO, User>()
+            .ForMember(dest => dest.Roles, opt => opt.Ignore());
+
 
             CreateMap<Address, IAddressDTO>().ReverseMap();
             CreateMap<Feedback, FeedbackDTO>().ReverseMap();
