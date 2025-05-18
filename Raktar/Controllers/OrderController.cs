@@ -12,19 +12,32 @@ namespace Raktar.Controllers
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _orderService;
-        
+
         public OrderController(IOrderService orderService)
         {
             _orderService = orderService;
         }
 
-        // POST: api/order
+        /// <summary>
+        /// Creating an Order.
+        /// </summary>
         [HttpPost]
         [Authorize(Roles = "Customer")]
         public async Task<ActionResult<OrderDTO>> CreateOrder([FromBody] OrderCreateDTO orderCreateDTO)
         {
             var newOrder = await _orderService.CreateOrderAsync(orderCreateDTO);
             return CreatedAtAction(nameof(GetOrderById), new { id = newOrder.OrderId }, newOrder);
+        }
+
+        /// <summary>
+        /// Add item to Order
+        /// </summary>
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Customer")]
+        public async Task<ActionResult<OrderDTO>> AddToOrder([FromRoute] int id, [FromBody] AddOrderItemDTO addOrderItemDTO)
+        {
+            var order = await _orderService.AddItemToOrderAsync(id, addOrderItemDTO);
+            return Ok(order);
         }
 
         // GET: api/order/5
@@ -43,12 +56,15 @@ namespace Raktar.Controllers
             }
         }
 
+        /// <summary>
+        /// Change the order's status. Validation implementation needed.
+        /// </summary>
         [HttpPut("delivery/{id}")]
         [Authorize]
-        public async Task<IActionResult> ChangeOrderStatus(int id, [FromBody] OrderStatus newStatus)
+        public async Task<IActionResult> ChangeOrderStatus(int id, [FromBody] OrderStatusDTO newStatus)
         {
             // If the logged-in user has the role "Customer", they are only allowed to cancel orders.
-            if (User.IsInRole("Customer") && newStatus != OrderStatus.Cancelled)
+            if (User.IsInRole("Customer") && (newStatus.OrderStatus != OrderStatus.Cancelled || newStatus.DelliveryDate is not null))
             {
                 return Forbid("Users with the 'User' role can only cancel orders.");
             }
@@ -69,5 +85,35 @@ namespace Raktar.Controllers
             var r = await _orderService.GetOrdersUndeliveredAsync();
             return Ok(r);
         }
+
+        [HttpGet("delivery/user/{userId}")]
+        [Authorize] // Use [Authorize] if you require a valid token
+        public async Task<IActionResult> GetUndeliveredOrdersByUserId(int userId)
+        {
+            // Extract the numeric user ID from the token's claims
+            string claimUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (User.IsInRole("Customer") && userId.ToString() != claimUserId)
+            {
+                return Forbid("You can only view your own undelivered orders.");
+            }
+
+            var orders = await _orderService.GetUndeliveredOrdersByUserIdAsync(userId);
+            return Ok(orders);
+        }
+
+        [HttpGet("user/{userId}")]
+        [Authorize]
+        public async Task<IActionResult> GetOrdersByUserId(int userId)
+        {
+            string claimUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (User.IsInRole("Customer") && userId.ToString() != claimUserId)
+            {
+                return Forbid("You can only view your own orders.");
+            }
+
+            var orders = await _orderService.GetOrdersByUserIdAsync(userId);
+            return Ok(orders);
+        }
+
     }
 }

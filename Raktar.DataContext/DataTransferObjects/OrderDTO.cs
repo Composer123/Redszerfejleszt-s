@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Raktar.DataContext.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,12 +15,19 @@ namespace Raktar.DataContext.DataTransferObjects
         public DateTime OrderDate { get; set; }
         public DateTime? DeliveryDate { get; set; }
         public string Status { get; set; }
+        public ICollection<OrderItemDTO> OrderItems { get; set; }
     }
 
     public class OrderCreateDTO
     {
         public int UserId { get; set; }
         public int DeliveryAdressId { get; set; }
-        public DateTime? DeliveryDate { get; set; }
+        public ICollection<AddOrderItemDTO> OrderItems { get; set; } = [];
+    }
+
+    public class OrderStatusDTO
+    {
+        public OrderStatus OrderStatus { get; set; }
+        public DateTime? DelliveryDate { get; set; }
     }
 }

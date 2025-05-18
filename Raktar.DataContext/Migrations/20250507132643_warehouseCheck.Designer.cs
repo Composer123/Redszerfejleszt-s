@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Raktar.DataContext;
 
@@ -11,9 +12,11 @@ using Raktar.DataContext;
 namespace Raktar.DataContext.Migrations
 {
     [DbContext(typeof(WarehouseDbContext))]
-    partial class WarehouseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250507132643_warehouseCheck")]
+    partial class warehouseCheck
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -310,10 +313,8 @@ namespace Raktar.DataContext.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("varbinary(128)");
 
-                    b.Property<string>("TelephoneNumber")
-                        .IsRequired()
-                        .HasMaxLength(16)
-                        .HasColumnType("nvarchar(16)");
+                    b.Property<int>("TelephoneNumber")
+                        .HasColumnType("int");
 
                     b.Property<string>("Username")
                         .IsRequired()
