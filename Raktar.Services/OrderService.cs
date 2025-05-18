@@ -11,7 +11,7 @@ namespace Raktar.Services
         Task<OrderDTO> CreateOrderAsync(OrderCreateDTO orderCreateDTO);
         Task<OrderDTO> AddItemToOrderAsync(int orderId,AddOrderItemDTO dto);
         Task<OrderDTO> GetOrderByIdAsync(int id);
-        Task<bool> ChangeStatusAsync(int orderId, IOrderStatusDTO status);
+        Task<bool> ChangeStatusAsync(int orderId, OrderStatusDTO status);
         Task<IEnumerable<OrderDTO>> GetOrdersUndeliveredAsync();
         Task<IEnumerable<OrderDTO>> GetUndeliveredOrdersByUserIdAsync(int userId);
         Task<IEnumerable<OrderDTO>> GetOrdersByUserIdAsync(int userId);
@@ -66,15 +66,15 @@ namespace Raktar.Services
             return _mapper.Map<OrderDTO>(order);
         }
 
-        public async Task<bool> ChangeStatusAsync(int orderId, IOrderStatusDTO status)
+        public async Task<bool> ChangeStatusAsync(int orderId, OrderStatusDTO status)
         {
             Order? order = await _context.Orders.FindAsync(orderId);
             if (order is null)
                 return false;
 
             order.Status = status.OrderStatus;
-            if (status is OrderStatusDelliveryAcceptDTO dellivery)
-                order.DeliveryDate = dellivery.DelliveryDate;
+            if (status.DelliveryDate is not null )
+                order.DeliveryDate = status.DelliveryDate;
 
             await _context.SaveChangesAsync();
 

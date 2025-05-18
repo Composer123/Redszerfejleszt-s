@@ -52,10 +52,10 @@ namespace Raktar.Controllers
 
         [HttpPut("delivery/{id}")]
         [Authorize]
-        public async Task<IActionResult> ChangeOrderStatus(int id, [FromBody] IOrderStatusDTO newStatus)
+        public async Task<IActionResult> ChangeOrderStatus(int id, [FromBody] OrderStatusDTO newStatus)
         {
             // If the logged-in user has the role "Customer", they are only allowed to cancel orders.
-            if (User.IsInRole("Customer") && newStatus is not OrderCancelStatusDTO)
+            if (User.IsInRole("Customer") && (newStatus.OrderStatus != OrderStatus.Cancelled || newStatus.DelliveryDate is not null))
             {
                 return Forbid("Users with the 'User' role can only cancel orders.");
             }
