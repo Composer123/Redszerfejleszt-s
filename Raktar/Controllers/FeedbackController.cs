@@ -10,10 +10,12 @@ namespace Raktar.Controllers
     [Authorize]
     public class FeedbackController : ControllerBase
     {
+        private readonly IUserService _userService;
         private readonly IFeedbackService _feedbackService;
 
-        public FeedbackController(IFeedbackService feedbackService)
+        public FeedbackController(IUserService userService, IFeedbackService feedbackService)
         {
+            _userService = userService;
             _feedbackService = feedbackService;
         }
 
@@ -34,6 +36,13 @@ namespace Raktar.Controllers
             return CreatedAtAction(nameof(GetFeedbackById), new { id = feedback.FeedbackId }, feedback);
 
 
+        }
+        [HttpGet("all-feedbacks")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllFeedbacks()
+        {
+            var feedbacks = await _userService.GetAllFeedbacksAsync();
+            return Ok(feedbacks);
         }
 
 
