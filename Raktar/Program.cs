@@ -75,6 +75,7 @@ builder.Services.AddCors();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 // Swagger configuration
+builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
