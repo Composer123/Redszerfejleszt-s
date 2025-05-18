@@ -17,6 +17,6 @@ namespace Raktar.DataContext.DataTransferObjects
         [Range(0, int.MaxValue)]
         public int Quantity { get; set; }
         [Required]
-        public required ProductAssignDTO Item { get; set; }
+        public int ProductId { get; set; }
     }
 }

@@ -17,14 +17,4 @@ namespace Raktar.DataContext.DataTransferObjects
         public string Type { get; set; }
         public int MaxQuantityPerBlock { get; set; }
     }
-    /// <summary>
-    /// To be used to assign product to a certain block.
-    /// </summary>
-    public class ProductAssignDTO
-    {
-        [Required]
-        public int ProductId { get; set; }
-        [Required]
-        public int MaxQuantityPerBlock { get; set; }
-    }
 }

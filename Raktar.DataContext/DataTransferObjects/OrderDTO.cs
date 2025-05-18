@@ -22,25 +22,12 @@ namespace Raktar.DataContext.DataTransferObjects
     {
         public int UserId { get; set; }
         public int DeliveryAdressId { get; set; }
+        public ICollection<AddOrderItemDTO> OrderItems { get; set; } = [];
     }
 
-    public interface IOrderStatusDTO
+    public class OrderStatusDTO
     {
-        public OrderStatus OrderStatus { get; }
-    }
-
-    public class OrderCancelStatusDTO : IOrderStatusDTO
-    {
-        public OrderStatus OrderStatus { get; } = OrderStatus.Cancelled;
-    }
-
-    public class OrderStatusDelliveryAcceptDTO : IOrderStatusDTO
-    {
-        public OrderStatus OrderStatus { get; } = OrderStatus.Accepted;
-        public DateTime DelliveryDate { get; set; }
-    }
-    public class OrderStatusDTO : IOrderStatusDTO
-    {
-        public OrderStatus OrderStatus { get; init; }
+        public OrderStatus OrderStatus { get; set; }
+        public DateTime? DelliveryDate { get; set; }
     }
 }

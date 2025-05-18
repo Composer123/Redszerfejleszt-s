@@ -7,7 +7,8 @@ namespace Raktar.DataContext.DataTransferObjects
     {
         public int UserId { get; set; }
 
-        public int TelephoneNumber { get; set; }
+        [Phone]
+        public string TelephoneNumber { get; set; }
 
         public string Email { get; set; }
 
@@ -22,8 +23,8 @@ namespace Raktar.DataContext.DataTransferObjects
 
     public class UserRegisterDTO
     {
-        
-        public int TelephoneNumber { get; set; }
+        [Phone]
+        public string TelephoneNumber { get; set; }
 
         [Required]
         [EmailAddress]
