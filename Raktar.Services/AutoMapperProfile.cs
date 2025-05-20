@@ -9,39 +9,52 @@ namespace Raktar.Services
     {
         public AutoMapperProfile()
         {
+            // User mappings...
             CreateMap<User, UserDTO>().ReverseMap();
-            CreateMap<UserRegisterDTO, User>();
+            CreateMap<UserRegisterDTO, User>()
+                .ForMember(dest => dest.Password, opt => opt.MapFrom(src => Encoding.UTF8.GetBytes(src.Password)));
             CreateMap<UserUpdateDTO, User>()
-            .ForMember(dest => dest.Roles, opt => opt.Ignore());
+                .ForMember(dest => dest.Roles, opt => opt.Ignore());
 
-
-            CreateMap<Address, IAddressDTO>().ReverseMap();
+            // Feedback mappings...
             CreateMap<Feedback, FeedbackDTO>().ReverseMap();
             CreateMap<FeedbackCreateDTO, Feedback>();
 
+            // SimpleAddress mappings...
+            CreateMap<SimpleAddress, SimpleAddressDTO>()
+                .ForMember(dest => dest.AddressId,
+                           opt => opt.MapFrom(src => src.Address != null ? src.Address.AddressId : 0))
+                .ReverseMap();
+            CreateMap<SimpleAddressCreateDTO, SimpleAddress>();
 
-            CreateMap<SimpleAddress, SimpleAddressDTO>().ReverseMap();
+            // LandRegistryNumber mappings...
             CreateMap<LandRegistryNumber, LandRegistryNumberDTO>().ReverseMap();
-            
+            CreateMap<LandRegistryNumberCreateDTO, LandRegistryNumber>();
+
+            // Product mappings...
             CreateMap<Product, ProductDTO>().ReverseMap();
             CreateMap<ProductCreateDTO, Product>();
 
-            CreateMap<Order, OrderDTO>().ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
-            CreateMap<OrderCreateDTO, Order>().ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems));
+            // Order mappings
+            CreateMap<Order, OrderDTO>()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+                .ForMember(dest => dest.DeliveryAdressId,
+                           opt => opt.MapFrom(src => src.DeliveryAdress != null ? src.DeliveryAdress.AddressId : src.DeliveryAdressId));
+            CreateMap<OrderCreateDTO, Order>()
+                .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems));
+
+            // **Add this mapping for order items:**
+            CreateMap<OrderItem, OrderItemDTO>().ReverseMap();
             CreateMap<AddOrderItemDTO, OrderItem>();
 
-            CreateMap<Role, RoleDTO>();
-            CreateMap<User, UserDTO>()
-            .ForMember(dest => dest.Password, opt => opt.Ignore())  // don't expose the password
-            .ForMember(dest => dest.Orders, opt => opt.Ignore()); // ignore orders to avoid cycles
-
+            // Role and Settlement mappings...
             CreateMap<Role, RoleDTO>().ReverseMap();
+            CreateMap<User, UserDTO>()
+                .ForMember(dest => dest.Password, opt => opt.Ignore())
+                .ForMember(dest => dest.Orders, opt => opt.Ignore());
 
-            // Mapping from UserRegisterDTO (with a string Password) to User.
-            // This converts the string to a byte array when storing the password.
-            CreateMap<UserRegisterDTO, User>()
-                .ForMember(dest => dest.Password, opt => opt.MapFrom(src => Encoding.UTF8.GetBytes(src.Password)));
-
+            CreateMap<Settlement, SettlementDTO>();
+            CreateMap<SettlementDTO, Settlement>();
         }
     }
 }

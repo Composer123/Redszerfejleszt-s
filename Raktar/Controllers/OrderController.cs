@@ -128,6 +128,27 @@ namespace Raktar.Controllers
             var orders = await _orderService.GetOrdersByUserIdAsync(userId);
             return Ok(orders);
         }
+        [HttpPut("change/{orderId}")]
+        [Authorize(Roles = "Customer")]
+        public async Task<ActionResult<OrderDTO>> ChangeOrder(int orderId, [FromBody] ICollection<AddOrderItemDTO> newItems)
+        {
+            try
+            {
+                // Call ChangeOrderAsync to update the order with new items.
+                var updatedOrder = await _orderService.ChangeOrderAsync(orderId, newItems);
+                return Ok(updatedOrder);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                // Return a 404 Not Found status if the order or some product isn't found.
+                return NotFound(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Return a 400 Bad Request for invalid operations (e.g., changes after the 24-hour window).
+                return BadRequest(ex.Message);
+            }
+        }
 
     }
 }

@@ -23,6 +23,8 @@ namespace Raktar.Services
         Task<UserDTO> UpdateAddressAsync(int userId, SimpleAddressDTO addressDto);
         Task<IList<UserDTO>> GetRolesAsync();
         Task<UserDTO> GetUserByIdAsync(int userId);
+
+        Task<SimpleAddressDTO> GetLastUsedAddressAsync(int userId);
     }
 
     public class UserService : IUserService
@@ -221,6 +223,37 @@ namespace Raktar.Services
 
             return new ClaimsIdentity(claims, "Token");
         }
+
+        public async Task<SimpleAddressDTO> GetLastUsedAddressAsync(int userId)
+        {
+            var user = await _context.Users
+                .Include(u => u.Orders)
+                    .ThenInclude(o => o.DeliveryAdress)
+                .FirstOrDefaultAsync(u => u.UserId == userId);
+
+            if (user == null)
+            {
+                throw new KeyNotFoundException("User not found.");
+            }
+
+            var lastOrder = user.Orders
+                .OrderByDescending(o => o.OrderDate)
+                .FirstOrDefault(o => o.DeliveryAdress != null);
+
+            if (lastOrder == null || lastOrder.DeliveryAdress == null)
+            {
+                throw new KeyNotFoundException("No previous order with a delivery address was found.");
+            }
+
+            // Map to a concrete type, not the interface.
+            if (lastOrder.DeliveryAdress?.SimpleAddress == null)
+            {
+                return null; // or handle the lack of address details as needed
+            }
+            return _mapper.Map<SimpleAddressDTO>(lastOrder.DeliveryAdress.SimpleAddress);
+
+        }
+
 
 
     }

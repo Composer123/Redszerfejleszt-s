@@ -30,37 +30,100 @@ namespace Raktar.Services
         private readonly ILogger _logger = logger;
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="ArgumentException"></exception>
+        //public async Task<IAddressDTO> CreateAddressAsync(IAddressCreateDTO createDTO)
+        //{
+        //    ArgumentNullException.ThrowIfNull(createDTO);
+
+        //    Address address = new();
+        //    await _context.Addresses.AddAsync(address);
+
+        //    IAddressDTO r = null!;
+        //    switch (createDTO)
+        //    {
+        //        case SimpleAddressDTO dto:
+        //            SimpleAddress sa = _mapper.Map<SimpleAddress>(dto);
+        //            await _context.SimpleAddresses.AddAsync(sa);
+        //            r = _mapper.Map<SimpleAddressDTO>(sa);
+        //            if (_logger.IsEnabled(LogLevel.Debug))
+        //                _logger.LogDebug("Created address was a simple address.");
+        //            break;
+        //        case LandRegistryNumberCreateDTO dto:
+        //            LandRegistryNumber lrn = _mapper.Map<LandRegistryNumber>(dto);
+        //            await _context.LandRegistryNumbers.AddAsync(lrn);
+        //            r = _mapper.Map<LandRegistryNumberDTO>(lrn);
+        //            if (_logger.IsEnabled(LogLevel.Debug))
+        //                _logger.LogDebug("Created address was a land registry number.");
+        //            break;
+        //        default:
+        //            throw new ArgumentException("Unexpected address type. Cannot create.");
+        //    }
+
+        //    await _context.SaveChangesAsync();
+        //    return r;
+        //}
+
         public async Task<IAddressDTO> CreateAddressAsync(IAddressCreateDTO createDTO)
         {
             ArgumentNullException.ThrowIfNull(createDTO);
 
+            // Create the container Address
             Address address = new();
             await _context.Addresses.AddAsync(address);
 
-            IAddressDTO r = null!;
+            IAddressDTO result = null!;
             switch (createDTO)
             {
-                case SimpleAddressDTO dto:
-                    SimpleAddress sa = _mapper.Map<SimpleAddress>(dto);
-                    await _context.SimpleAddresses.AddAsync(sa);
-                    r = _mapper.Map<SimpleAddressDTO>(sa);
+                case SimpleAddressCreateDTO dto:
+                    var existingSettlement = await _context.Settlements.FirstOrDefaultAsync(s =>
+                        s.PostCode == dto.Settlement.PostCode &&
+                        s.SettlementName == dto.Settlement.SettlementName);
+
+                    if (existingSettlement == null)
+                    {
+                        throw new ArgumentException("The provided Settlement does not exist in the database.");
+                    }
+
+                    Settlement settlement = existingSettlement;
+                    SimpleAddress simpleAddress = _mapper.Map<SimpleAddress>(dto);
+                    simpleAddress.Settlement = settlement;
+                    simpleAddress.SettlementId = settlement.SettlementId;
+                    simpleAddress.Address = address;
+                    await _context.SimpleAddresses.AddAsync(simpleAddress);
+
+                    result = _mapper.Map<SimpleAddressDTO>(simpleAddress);
                     if (_logger.IsEnabled(LogLevel.Debug))
-                        _logger.LogDebug("Created address was a simple address.");
+                        _logger.LogDebug("Created address was a simple address using an existing settlement.");
                     break;
+
                 case LandRegistryNumberCreateDTO dto:
                     LandRegistryNumber lrn = _mapper.Map<LandRegistryNumber>(dto);
                     await _context.LandRegistryNumbers.AddAsync(lrn);
-                    r = _mapper.Map<LandRegistryNumberDTO>(lrn);
+                    result = _mapper.Map<LandRegistryNumberDTO>(lrn);
                     if (_logger.IsEnabled(LogLevel.Debug))
                         _logger.LogDebug("Created address was a land registry number.");
                     break;
+
                 default:
                     throw new ArgumentException("Unexpected address type. Cannot create.");
             }
 
             await _context.SaveChangesAsync();
-            return r;
+
+            // Ensure the new container gets the generated AddressId.
+            await _context.Entry(address).ReloadAsync();
+
+            // Optionally update the SimpleAddress entity if needed:
+            if (result is SimpleAddressDTO simpleDto)
+            {
+                simpleDto.AddressId = address.AddressId;
+            }
+
+            return result;
         }
+
+
+
+
         /// <exception cref="InvalidOperationException"></exception>
         public async Task<IAddressDTO> GetAddressAsync(int addressId)
         {

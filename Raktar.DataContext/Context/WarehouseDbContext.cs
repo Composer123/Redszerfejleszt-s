@@ -223,6 +223,11 @@ public partial class WarehouseDbContext : DbContext
             entity.Property(e => e.Password).HasMaxLength(128);
             entity.Property(e => e.Username).HasMaxLength(320);
         });
+        modelBuilder.Entity<Address>()
+    .HasOne(a => a.SimpleAddress)
+    .WithOne(sa => sa.Address)
+    .HasForeignKey<SimpleAddress>(sa => sa.AddressId);
+
 
         OnModelCreatingPartial(modelBuilder);
     }

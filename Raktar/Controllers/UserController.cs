@@ -72,5 +72,22 @@ namespace Raktar.Controllers
             }
             return Ok(user);
         }
+
+        /// <summary>
+        /// Returns the last used delivery address for the specified user.
+        /// </summary>
+        [HttpGet("{userId}/lastusedaddress")]
+        public async Task<ActionResult<SimpleAddressDTO>> GetLastUsedAddress(int userId)
+        {
+            try
+            {
+                var addressDto = await _userService.GetLastUsedAddressAsync(userId);
+                return Ok(addressDto);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
     }
 }

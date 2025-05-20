@@ -16,6 +16,7 @@ namespace Raktar.Services
         Task<IEnumerable<OrderDTO>> GetUndeliveredOrdersByUserIdAsync(int userId);
         Task<IEnumerable<OrderDTO>> GetOrdersByUserIdAsync(int userId);
         Task<IEnumerable<OrderDTO>> GetAllOrdersAsync();
+        Task<OrderDTO> ChangeOrderAsync(int orderId, ICollection<AddOrderItemDTO> newItems);
 
     }
     public class OrderService : IOrderService
