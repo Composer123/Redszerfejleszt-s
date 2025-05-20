@@ -148,24 +148,53 @@ namespace Raktar.Services
 
         public async Task<UserDTO> UpdateAddressAsync(int userId, SimpleAddressDTO addressDto)
         {
-            var user = await _context.Users.Include(u => u.Orders).ThenInclude(o => o.DeliveryAdress).FirstOrDefaultAsync(u => u.UserId == userId);
+            // Retrieve the user and include orders with their DeliveryAdress.
+            var user = await _context.Users
+                .Include(u => u.Orders)
+                    .ThenInclude(o => o.DeliveryAdress)
+                .FirstOrDefaultAsync(u => u.UserId == userId);
+
             if (user == null)
             {
                 throw new KeyNotFoundException("User not found.");
             }
 
-            var address = _mapper.Map<Address>(addressDto); // Map to Address instead of SimpleAddress
-            var order = user.Orders
-                .OrderByDescending(o => o.OrderDate)
-                .FirstOrDefault();
-            
-            if (order != null)
+            // Create a new address from the DTO using your existing mapping for SimpleAddress.
+            var simpleAddress = _mapper.Map<SimpleAddress>(addressDto);
+            var newAddress = new Address
             {
-                if ((DateTime.Now - order.OrderDate).TotalHours > 24)
-                {
-                    throw new InvalidOperationException("Cannot update address after 24 hours of order placement.");
-                }
-                order.DeliveryAdress = address;
+                SimpleAddress = simpleAddress
+            };
+
+            // Get the user's last order (by order date) that has a DeliveryAdress.
+            var lastOrder = user.Orders
+                .OrderByDescending(o => o.OrderDate)
+                .FirstOrDefault(o => o.DeliveryAdress != null);
+
+            if (lastOrder == null || lastOrder.DeliveryAdress == null)
+            {
+                throw new KeyNotFoundException("No orders found with a valid delivery address.");
+            }
+
+            // Use the last order's delivery address as the "current" address.
+            var oldAddressId = lastOrder.DeliveryAdress.AddressId;
+
+            // Find all orders using that delivery address and placed within the last 24 hours.
+            var ordersToUpdate = user.Orders
+                .Where(o => o.DeliveryAdress != null
+                            && o.DeliveryAdress.AddressId == oldAddressId
+                            && (DateTime.Now - o.OrderDate).TotalHours <= 24)
+                .ToList();
+
+            if (ordersToUpdate.Count == 0)
+            {
+                throw new InvalidOperationException("No orders using the latest delivery address were placed within the last 24 hours to update.");
+            }
+
+            // Update all matching orders to use the new address.
+            foreach (var order in ordersToUpdate)
+            {
+                order.DeliveryAdress = newAddress;
             }
 
             _context.Users.Update(user);
@@ -173,6 +202,7 @@ namespace Raktar.Services
 
             return _mapper.Map<UserDTO>(user);
         }
+
 
         //[Authorize(Roles = "Admin")]
         public async Task<IList<UserDTO>> GetRolesAsync()
@@ -228,8 +258,10 @@ namespace Raktar.Services
         {
             var user = await _context.Users
                 .Include(u => u.Orders)
-                    .ThenInclude(o => o.DeliveryAdress)
+                .ThenInclude(o => o.DeliveryAdress)
+                .ThenInclude(a => a.SimpleAddress)  // Explicitly include SimpleAddress
                 .FirstOrDefaultAsync(u => u.UserId == userId);
+
 
             if (user == null)
             {
@@ -240,21 +272,13 @@ namespace Raktar.Services
                 .OrderByDescending(o => o.OrderDate)
                 .FirstOrDefault(o => o.DeliveryAdress != null);
 
-            if (lastOrder == null || lastOrder.DeliveryAdress == null)
+            if (lastOrder?.DeliveryAdress?.SimpleAddress == null)
             {
-                throw new KeyNotFoundException("No previous order with a delivery address was found.");
+                throw new KeyNotFoundException("No previous order with a valid delivery address was found.");
             }
 
-            // Map to a concrete type, not the interface.
-            if (lastOrder.DeliveryAdress?.SimpleAddress == null)
-            {
-                return null; // or handle the lack of address details as needed
-            }
             return _mapper.Map<SimpleAddressDTO>(lastOrder.DeliveryAdress.SimpleAddress);
-
         }
-
-
 
     }
 }

@@ -77,6 +77,7 @@ namespace Raktar.Controllers
         /// Returns the last used delivery address for the specified user.
         /// </summary>
         [HttpGet("{userId}/lastusedaddress")]
+        [AllowAnonymous]
         public async Task<ActionResult<SimpleAddressDTO>> GetLastUsedAddress(int userId)
         {
             try

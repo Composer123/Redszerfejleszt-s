@@ -17,7 +17,12 @@ namespace Raktar.Services
                 .ForMember(dest => dest.Roles, opt => opt.Ignore());
 
             // Feedback mappings...
-            CreateMap<Feedback, FeedbackDTO>().ReverseMap();
+            CreateMap<Feedback, FeedbackDTO>()
+    // Use the first order item’s Order if available, otherwise return null.
+    .ForMember(dest => dest.Order, opt => opt.MapFrom(src => src.OrderItems.FirstOrDefault() != null ? src.OrderItems.FirstOrDefault().Order : null));
+
+
+
             CreateMap<FeedbackCreateDTO, Feedback>();
 
             // SimpleAddress mappings...
@@ -44,7 +49,11 @@ namespace Raktar.Services
                 .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems));
 
             // **Add this mapping for order items:**
-            CreateMap<OrderItem, OrderItemDTO>().ReverseMap();
+            
+            CreateMap<OrderItem, OrderItemDTO>()
+    .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
+    .ReverseMap();
+
             CreateMap<AddOrderItemDTO, OrderItem>();
 
             // Role and Settlement mappings...

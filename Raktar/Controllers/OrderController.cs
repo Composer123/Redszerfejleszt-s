@@ -32,13 +32,13 @@ namespace Raktar.Controllers
         /// <summary>
         /// Add item to Order
         /// </summary>
-        [HttpPut("{id}")]
-        [Authorize(Roles = "Customer")]
-        public async Task<ActionResult<OrderDTO>> AddToOrder([FromRoute] int id, [FromBody] AddOrderItemDTO addOrderItemDTO)
-        {
-            var order = await _orderService.AddItemToOrderAsync(id, addOrderItemDTO);
-            return Ok(order);
-        }
+        //[HttpPut("{id}")]
+        //[Authorize(Roles = "Customer")]
+        //public async Task<ActionResult<OrderDTO>> AddToOrder([FromRoute] int id, [FromBody] AddOrderItemDTO addOrderItemDTO)
+        //{
+        //    var order = await _orderService.AddItemToOrderAsync(id, addOrderItemDTO);
+        //    return Ok(order);
+        //}
 
         // GET: api/order/5
         [HttpGet("{id}")]
@@ -48,6 +48,10 @@ namespace Raktar.Controllers
             try
             {
                 var order = await _orderService.GetOrderByIdAsync(id);
+                if (order == null)
+                {
+                    return NotFound($"Order with ID {id} not found.");
+                }
                 return Ok(order);
             }
             catch (KeyNotFoundException)
@@ -55,6 +59,33 @@ namespace Raktar.Controllers
                 return NotFound($"Order with ID {id} not found.");
             }
         }
+        [HttpGet("admin")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<IEnumerable<OrderDTO>>> GetAllOrders()
+        {
+            var orders = await _orderService.GetAllOrdersAsync();
+            return Ok(orders);
+        }
+
+        [HttpPut("admin/change/{orderId}")]
+        [Authorize(Roles = "Admin,Supplier")]
+        public async Task<ActionResult<OrderDTO>> AdminChangeOrder(int orderId, [FromBody] ChangeOrderDTO changeOrderDto)
+        {
+            try
+            {
+                var updatedOrder = await _orderService.AdminChangeOrderAsync(orderId, changeOrderDto);
+                return Ok(updatedOrder);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
 
         /// <summary>
         /// Change the order's status. Validation implementation needed.
@@ -130,25 +161,45 @@ namespace Raktar.Controllers
         }
         [HttpPut("change/{orderId}")]
         [Authorize(Roles = "Customer")]
-        public async Task<ActionResult<OrderDTO>> ChangeOrder(int orderId, [FromBody] ICollection<AddOrderItemDTO> newItems)
+        public async Task<ActionResult<OrderDTO>> ChangeOrder(int orderId, [FromBody] ChangeOrderDTO changeOrderDto)
         {
             try
             {
-                // Call ChangeOrderAsync to update the order with new items.
-                var updatedOrder = await _orderService.ChangeOrderAsync(orderId, newItems);
+                var updatedOrder = await _orderService.ChangeOrderAsync(orderId, changeOrderDto);
                 return Ok(updatedOrder);
             }
             catch (KeyNotFoundException ex)
             {
-                // Return a 404 Not Found status if the order or some product isn't found.
                 return NotFound(ex.Message);
             }
             catch (InvalidOperationException ex)
             {
-                // Return a 400 Bad Request for invalid operations (e.g., changes after the 24-hour window).
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPut("change-delivery-date/{orderId}")]
+        [Authorize(Roles = "Admin,Transporter")]
+        public async Task<IActionResult> ChangeDeliveryDate(int orderId, [FromBody] ChangeDeliveryDateDTO changeDeliveryDateDTO)
+        {
+            try
+            {
+                // Call the service method to update the delivery date.
+                var updatedOrder = await _orderService.ChangeDeliveryDateAsync(orderId, changeDeliveryDateDTO.NewDeliveryDate);
+                return Ok(updatedOrder);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                // Optionally log the exception
+                return BadRequest($"Error updating delivery date: {ex.Message}");
+            }
+        }
+
+
 
     }
 }

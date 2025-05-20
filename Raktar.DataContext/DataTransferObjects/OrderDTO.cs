@@ -30,4 +30,24 @@ namespace Raktar.DataContext.DataTransferObjects
         public OrderStatus OrderStatus { get; set; }
         public DateTime? DelliveryDate { get; set; }
     }
+
+    public class ChangeOrderDTO
+    {
+        /// <summary>
+        /// The new order items for the order.
+        /// </summary>
+        public ICollection<AddOrderItemDTO> NewItems { get; set; } = new List<AddOrderItemDTO>();
+
+        /// <summary>
+        /// (Optional) Updated address for the order.
+        /// If provided, the order’s DeliveryAdress will be replaced.
+        /// </summary>
+        public SimpleAddressDTO? UpdatedAddress { get; set; }
+    }
+
+    public class ChangeDeliveryDateDTO
+    {
+        public DateTime NewDeliveryDate { get; set; }
+    }
+
 }
