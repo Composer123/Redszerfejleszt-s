@@ -57,32 +57,12 @@ namespace Raktar.Controllers
         }
 
         /// <summary>
-        /// Change the order's status. Validation implementation needed.
+        /// Change the order's status. Only for Admin role.
         /// </summary>
         [HttpPut("delivery/{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ChangeOrderStatus(int id, [FromBody] OrderStatusDTO newStatus)
         {
-
-            // If the logged-in user has the role "Customer", they are only allowed to cancel orders.
-            if (!(User.IsInRole("Admin")))
-            {
-                if (User.IsInRole("Customer") && (newStatus.OrderStatus != OrderStatus.Cancelled || newStatus.DelliveryDate is not null))
-                {
-                    return Forbid("Users with the 'User' role can only cancel orders.");
-                }
-                if (User.IsInRole("Transporter") && (newStatus.OrderStatus != OrderStatus.Delivered || newStatus.OrderStatus != OrderStatus.Cancelled || newStatus.OrderStatus != OrderStatus.Undeliverible || newStatus.DelliveryDate is not null))
-                {
-                    return Forbid("Users with the 'Transporter' role cannot set that status.");
-                }
-                if (User.IsInRole("Supplier") && (newStatus.OrderStatus != OrderStatus.ReadyForDelivery || newStatus.OrderStatus != OrderStatus.Cancelled || newStatus.OrderStatus != OrderStatus.Undeliverible || newStatus.DelliveryDate is not null))
-                {
-                    return Forbid("Users with the 'Transporter' role cannot set that status.");
-                }
-
-            }
-           
-
             bool success = await _orderService.ChangeStatusAsync(id, newStatus);
             if (!success)
             {
@@ -93,24 +73,17 @@ namespace Raktar.Controllers
         }
 
         [HttpGet("delivery")]
-        [AllowAnonymous]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetUndeliveredOrders()
         {
-            var r = await _orderService.GetOrdersUndeliveredAsync();
-            return Ok(r);
+            var orders = await _orderService.GetOrdersUndeliveredAsync();
+            return Ok(orders);
         }
 
         [HttpGet("delivery/user/{userId}")]
-        [Authorize] // Use [Authorize] if you require a valid token
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetUndeliveredOrdersByUserId(int userId)
         {
-            // Extract the numeric user ID from the token's claims
-            string claimUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (User.IsInRole("Customer") && userId.ToString() != claimUserId)
-            {
-                return Forbid("You can only view your own undelivered orders.");
-            }
-
             var orders = await _orderService.GetUndeliveredOrdersByUserIdAsync(userId);
             return Ok(orders);
         }
