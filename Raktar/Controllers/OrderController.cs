@@ -60,7 +60,7 @@ namespace Raktar.Controllers
             }
         }
         [HttpGet("admin")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Transporter, Supplier")]
         public async Task<ActionResult<IEnumerable<OrderDTO>>> GetAllOrders()
         {
             var orders = await _orderService.GetAllOrdersAsync();
@@ -96,23 +96,18 @@ namespace Raktar.Controllers
         {
 
             // If the logged-in user has the role "Customer", they are only allowed to cancel orders.
-            if (!(User.IsInRole("Admin")))
+            if (!User.IsInRole("Admin"))
             {
-                if (User.IsInRole("Customer") && (newStatus.OrderStatus != OrderStatus.Cancelled || newStatus.DelliveryDate is not null))
-                {
-                    return Forbid("Users with the 'User' role can only cancel orders.");
-                }
-                if (User.IsInRole("Transporter") && (newStatus.OrderStatus != OrderStatus.Delivered || newStatus.OrderStatus != OrderStatus.Cancelled || newStatus.OrderStatus != OrderStatus.Undeliverible || newStatus.DelliveryDate is not null))
-                {
-                    return Forbid("Users with the 'Transporter' role cannot set that status.");
-                }
-                if (User.IsInRole("Supplier") && (newStatus.OrderStatus != OrderStatus.ReadyForDelivery || newStatus.OrderStatus != OrderStatus.Cancelled || newStatus.OrderStatus != OrderStatus.Undeliverible || newStatus.DelliveryDate is not null))
-                {
-                    return Forbid("Users with the 'Transporter' role cannot set that status.");
-                }
+                bool canCancelOrders = User.IsInRole("Customer");
+                bool canDeliverOrders = User.IsInRole("Transporter") && (newStatus.OrderStatus == OrderStatus.Delivered || newStatus.OrderStatus == OrderStatus.Cancelled || newStatus.OrderStatus == OrderStatus.Undeliverible) && newStatus.DelliveryDate is null;
+                bool canPrepareOrders = User.IsInRole("Supplier") && (newStatus.OrderStatus == OrderStatus.ReadyForDelivery || newStatus.OrderStatus == OrderStatus.Cancelled || newStatus.OrderStatus == OrderStatus.Undeliverible) && newStatus.DelliveryDate is null;
 
+                if (!(canCancelOrders || canDeliverOrders || canPrepareOrders))
+                {
+                    return Forbid("You do not have the necessary permissions for this action.");
+                }
             }
-           
+
 
             bool success = await _orderService.ChangeStatusAsync(id, newStatus);
             if (!success)
