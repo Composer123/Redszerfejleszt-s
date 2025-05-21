@@ -11,6 +11,7 @@ namespace Raktar.DataContext.DataTransferObjects
         public int Quantity { get; set; }
 
         public int? FeedbackId { get; set; }
+        public string ProductName { get; set; }
     }
     public class AddOrderItemDTO
     {

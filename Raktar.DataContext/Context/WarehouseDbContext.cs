@@ -134,6 +134,10 @@ public partial class WarehouseDbContext : DbContext
             entity.HasMany(d => d.OrderItems).WithOne(p => p.Order)
                 .HasForeignKey(d => d.OrderId)
                 .HasConstraintName("FK__Orders__OrderItems");
+
+            entity.HasOne(d => d.Carrier).WithMany(p => p.CarriedOrders)
+                .HasForeignKey(d => d.CarrierId)
+                .HasConstraintName("FK__Orders__Carrier");
         });
 
         modelBuilder.Entity<Product>(entity =>
@@ -223,6 +227,11 @@ public partial class WarehouseDbContext : DbContext
             entity.Property(e => e.Password).HasMaxLength(128);
             entity.Property(e => e.Username).HasMaxLength(320);
         });
+        modelBuilder.Entity<Address>()
+    .HasOne(a => a.SimpleAddress)
+    .WithOne(sa => sa.Address)
+    .HasForeignKey<SimpleAddress>(sa => sa.AddressId);
+
 
         OnModelCreatingPartial(modelBuilder);
     }

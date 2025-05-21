@@ -18,7 +18,9 @@ public partial class User
 
     public byte[] Password { get; set; }
 
-    public ICollection<Order> Orders { get; set; } = new List<Order>();
+    public ICollection<Order> Orders { get; set; } = [];
 
-    public ICollection<Role> Roles { get; set; } = new List<Role>();
+    public ICollection<Order> CarriedOrders { get; set; } = [];
+
+    public ICollection<Role> Roles { get; set; } = [];
 }

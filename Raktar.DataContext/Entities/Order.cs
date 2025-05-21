@@ -5,8 +5,9 @@ namespace Raktar.DataContext.Entities;
 public enum OrderStatus
 {
     Pending,
-    Accepted,
+    Processing,
     ReadyForDelivery,
+    Accepted,
     Delivered,
     Cancelled,
     Undeliverible
@@ -17,6 +18,8 @@ public partial class Order
     public int UserId { get; set; }
 
     public int OrderId { get; set; }
+
+    public int? CarrierId { get; set; }
 
     public int DeliveryAdressId { get; set; }
 
@@ -31,5 +34,7 @@ public partial class Order
     public Address DeliveryAdress { get; set; }
 
     public User User { get; set; }
+
+    public User? Carrier { get; set; }
 
 }
