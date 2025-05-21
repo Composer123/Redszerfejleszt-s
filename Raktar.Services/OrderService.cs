@@ -18,7 +18,10 @@ namespace Raktar.Services
         Task<OrderDTO> ChangeOrderAsync(int orderId, ChangeOrderDTO changeOrderDto);
         Task<OrderDTO> AdminChangeOrderAsync(int orderId, ChangeOrderAdminDTO changeOrderDto);
         Task<OrderDTO> ChangeDeliveryDateAsync(int orderId, DateTime newDeliveryDate);
-        Task<OrderDTO> AssignCarrier(int orderId, AssignOrderCarrierDTO dto);
+        //Task<OrderDTO> AssignCarrier(int orderId, AssignOrderCarrierDTO dto);
+        Task<bool> AssignCarrierAsync(int orderId, int carrierId);
+        Task<IEnumerable<UserDTO>> GetTransportersAsync();
+        Task<IEnumerable<OrderDTO>> GetOrdersForCarrierAsync(int carrierId);
 
     }
     public class OrderService : IOrderService
@@ -273,14 +276,55 @@ namespace Raktar.Services
             return _mapper.Map<OrderDTO>(order);
         }
 
-        public async Task<OrderDTO> AssignCarrier(int orderId, AssignOrderCarrierDTO dto)
+        public async Task<bool> AssignCarrierAsync(int orderId, int carrierId)
         {
-            var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId)
-                ?? throw new KeyNotFoundException($"Order with id {orderId} was not found.");
+            // Get the order by its ID
+            var order = await _context.Orders.FindAsync(orderId);
+            if (order == null)
+                throw new Exception("Order not found.");
 
-            order.CarrierId = dto.CarrierId;
+            // Load the potential carrier including their Roles
+            var carrier = await _context.Users
+                .Include(u => u.Roles)  // Assumes User has a Roles navigation property
+                .FirstOrDefaultAsync(u => u.UserId == carrierId);
+
+            if (carrier == null)
+                throw new Exception("Carrier not found.");
+
+            // Check if the selected user has a Transporter role.
+            if (!carrier.Roles.Any(r => r.RoleName == "Transporter"))
+                throw new Exception("The selected user is not a valid transporter.");
+
+            // Assign the carrier to the order (and optionally change its status)
+            order.CarrierId = carrierId;
+            // For example: order.Status = OrderStatus.Processing;
+
+            _context.Orders.Update(order);
             await _context.SaveChangesAsync();
-            return _mapper.Map<OrderDTO>(order);
+            return true;
         }
+
+        public async Task<IEnumerable<UserDTO>> GetTransportersAsync()
+        {
+            var transporters = await _context.Users
+                .Include(u => u.Roles)
+                .Where(u => u.Roles.Any(r => r.RoleName == "Transporter"))
+                .ToListAsync();
+
+            return _mapper.Map<IEnumerable<UserDTO>>(transporters);
+        }
+
+        public async Task<IEnumerable<OrderDTO>> GetOrdersForCarrierAsync(int carrierId)
+        {
+            var orders = await _context.Orders
+                .Include(o => o.OrderItems)
+                .Include(o => o.DeliveryAdress)
+                    .ThenInclude(a => a.SimpleAddress)
+                .Where(o => o.CarrierId == carrierId)
+                .ToListAsync();
+
+            return _mapper.Map<IEnumerable<OrderDTO>>(orders);
+        }
+
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Raktar.DataContext.DataTransferObjects;
 using Raktar.DataContext.Entities;
 using Raktar.Services;
+using System.Security.Claims;
 
 namespace Raktar.Controllers
 {
@@ -75,21 +76,24 @@ namespace Raktar.Controllers
             }
         }
 
-        [HttpPut("admin/delivery/{orderId}")]
-        [Authorize(Roles = "Admin,Supplier")]
-        public async Task<ActionResult<OrderDTO>> AdminChangeOrder(int orderId, [FromBody] AssignOrderCarrierDTO dto)
+        // PUT: api/order/assign-carrier/{orderId}
+        [HttpPut("assign-carrier/{orderId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AssignCarrier(int orderId, [FromBody] AssignOrderCarrierDTO dto)
         {
             try
             {
-                var updatedOrder = await _orderService.AssignCarrier(orderId, dto);
-                return Ok(updatedOrder);
+                var result = await _orderService.AssignCarrierAsync(orderId, dto.CarrierId);
+                if (result)
+                    return Ok("Carrier assigned successfully.");
+                else
+                    return BadRequest("Failed to assign carrier.");
             }
-            catch (KeyNotFoundException ex)
+            catch (Exception ex)
             {
-                return NotFound(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
-
 
         /// <summary>
         /// Change the order's status. Validation implementation needed.
@@ -205,6 +209,49 @@ namespace Raktar.Controllers
             }
         }
 
+        [HttpGet("transporters")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<IEnumerable<UserDTO>>> GetTransporters()
+        {
+            try
+            {
+                var transporters = await _orderService.GetTransportersAsync();
+                return Ok(transporters);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        // GET: api/order/transporter
+        [HttpGet("transporter")]
+        [Authorize(Roles = "Transporter")]
+        public async Task<ActionResult<IEnumerable<OrderDTO>>> GetOrdersForTransporter()
+        {
+            try
+            {
+                // Retrieve the authenticated transporter's ID from token claims.
+                // Adjust the claim type if necessary (e.g. "sub" or ClaimTypes.NameIdentifier).
+                var transporterIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(transporterIdClaim))
+                {
+                    return Unauthorized("Transporter ID not found in token.");
+                }
+
+                if (!int.TryParse(transporterIdClaim, out int transporterId))
+                {
+                    return BadRequest("Invalid transporter ID.");
+                }
+
+                var orders = await _orderService.GetOrdersForCarrierAsync(transporterId);
+                return Ok(orders);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
 
     }

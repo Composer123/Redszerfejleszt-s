@@ -18,8 +18,8 @@ namespace Raktar.Services
 
             // Feedback mappings...
             CreateMap<Feedback, FeedbackDTO>()
-    // Use the first order item’s Order if available, otherwise return null.
-    .ForMember(dest => dest.Order, opt => opt.MapFrom(src => src.OrderItems.FirstOrDefault() != null ? src.OrderItems.FirstOrDefault().Order : null));
+            // Use the first order item’s Order if available, otherwise return null.
+            .ForMember(dest => dest.Order, opt => opt.MapFrom(src => src.OrderItems.FirstOrDefault() != null ? src.OrderItems.FirstOrDefault().Order : null));
 
 
 
@@ -45,7 +45,8 @@ namespace Raktar.Services
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
                 .ForMember(dest => dest.DeliveryAdressId,
                            opt => opt.MapFrom(src => src.DeliveryAdress != null ? src.DeliveryAdress.AddressId : src.DeliveryAdressId));
-            CreateMap<OrderCreateDTO, Order>()
+                //.ForMember(dest => dest.CarrierId, opt => opt.MapFrom(src => src.CarrierId));
+                CreateMap<OrderCreateDTO, Order>()
                 .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems));
 
             // **Add this mapping for order items:**
