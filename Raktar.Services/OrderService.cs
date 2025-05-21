@@ -238,6 +238,8 @@ namespace Raktar.Services
                 await _context.Orders
                 .Where(o => o.Status == OrderStatus.ReadyForDelivery)
                 .Select(o => _mapper.Map<OrderDTO>(o))
+                .OrderBy(a => a.Status)
+                .ThenBy(a => a.OrderDate)
                 .ToListAsync();
         }
 
@@ -246,6 +248,8 @@ namespace Raktar.Services
             return await _context.Orders
                 .Where(o => o.Status == OrderStatus.ReadyForDelivery && o.UserId == userId)
                 .Select(o => _mapper.Map<OrderDTO>(o))
+                .OrderBy(a => a.Status)
+                .ThenBy(a => a.OrderDate)
                 .ToListAsync();
         }
 
@@ -254,6 +258,8 @@ namespace Raktar.Services
             return await _context.Orders
                 .Where(o => o.UserId == userId)
                 .Select(o => _mapper.Map<OrderDTO>(o))
+                .OrderBy(a => a.Status)
+                .ThenBy(a => a.OrderDate)
                 .ToListAsync();
         }
 
@@ -321,6 +327,8 @@ namespace Raktar.Services
                 .Include(o => o.DeliveryAdress)
                     .ThenInclude(a => a.SimpleAddress)
                 .Where(o => o.CarrierId == carrierId)
+                .OrderBy(a => a.Status)
+                .ThenBy(a => a.OrderDate)
                 .ToListAsync();
 
             return _mapper.Map<IEnumerable<OrderDTO>>(orders);

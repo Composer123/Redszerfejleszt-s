@@ -15,7 +15,7 @@ namespace Raktar.DataContext.DataTransferObjects
     public class FeedbackCreateDTO
     {
         [Required]
-        [Range(0,5)]
+        [Range(1,5, MinimumIsExclusive = false, MaximumIsExclusive = false)]
         public byte StarRating { get; set; }
         public string? FeedbackText { get; set; }
         public int OrderId { get; set; }
