@@ -29,17 +29,6 @@ namespace Raktar.Controllers
             return CreatedAtAction(nameof(GetOrderById), new { id = newOrder.OrderId }, newOrder);
         }
 
-        /// <summary>
-        /// Add item to Order
-        /// </summary>
-        //[HttpPut("{id}")]
-        //[Authorize(Roles = "Customer")]
-        //public async Task<ActionResult<OrderDTO>> AddToOrder([FromRoute] int id, [FromBody] AddOrderItemDTO addOrderItemDTO)
-        //{
-        //    var order = await _orderService.AddItemToOrderAsync(id, addOrderItemDTO);
-        //    return Ok(order);
-        //}
-
         // GET: api/order/5
         [HttpGet("{id}")]
         [AllowAnonymous]
@@ -69,7 +58,7 @@ namespace Raktar.Controllers
 
         [HttpPut("admin/change/{orderId}")]
         [Authorize(Roles = "Admin,Supplier")]
-        public async Task<ActionResult<OrderDTO>> AdminChangeOrder(int orderId, [FromBody] ChangeOrderDTO changeOrderDto)
+        public async Task<ActionResult<OrderDTO>> AdminChangeOrder(int orderId, [FromBody] ChangeOrderAdminDTO changeOrderDto)
         {
             try
             {
@@ -86,6 +75,21 @@ namespace Raktar.Controllers
             }
         }
 
+        [HttpPut("admin/delivery/{orderId}")]
+        [Authorize(Roles = "Admin,Supplier")]
+        public async Task<ActionResult<OrderDTO>> AdminChangeOrder(int orderId, [FromBody] AssignOrderCarrierDTO dto)
+        {
+            try
+            {
+                var updatedOrder = await _orderService.AssignCarrier(orderId, dto);
+                return Ok(updatedOrder);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
 
         /// <summary>
         /// Change the order's status. Validation implementation needed.
@@ -99,8 +103,15 @@ namespace Raktar.Controllers
             if (!User.IsInRole("Admin"))
             {
                 bool canCancelOrders = User.IsInRole("Customer");
-                bool canDeliverOrders = User.IsInRole("Transporter") && (newStatus.OrderStatus == OrderStatus.Delivered || newStatus.OrderStatus == OrderStatus.Cancelled || newStatus.OrderStatus == OrderStatus.Undeliverible) && newStatus.DelliveryDate is null;
-                bool canPrepareOrders = User.IsInRole("Supplier") && (newStatus.OrderStatus == OrderStatus.ReadyForDelivery || newStatus.OrderStatus == OrderStatus.Cancelled || newStatus.OrderStatus == OrderStatus.Undeliverible) && newStatus.DelliveryDate is null;
+                bool canDeliverOrders = User.IsInRole("Transporter") && (
+                    newStatus.OrderStatus == OrderStatus.Accepted || 
+                    newStatus.OrderStatus == OrderStatus.Delivered || 
+                    newStatus.OrderStatus == OrderStatus.Cancelled || 
+                    newStatus.OrderStatus == OrderStatus.Undeliverible) && newStatus.DelliveryDate is null;
+                bool canPrepareOrders = User.IsInRole("Supplier") && (
+                    newStatus.OrderStatus == OrderStatus.ReadyForDelivery || 
+                    newStatus.OrderStatus == OrderStatus.Cancelled || 
+                    newStatus.OrderStatus == OrderStatus.Undeliverible) && newStatus.DelliveryDate is null;
 
                 if (!(canCancelOrders || canDeliverOrders || canPrepareOrders))
                 {
@@ -131,7 +142,7 @@ namespace Raktar.Controllers
         public async Task<IActionResult> GetUndeliveredOrdersByUserId(int userId)
         {
             // Extract the numeric user ID from the token's claims
-            string claimUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            string? claimUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             if (User.IsInRole("Customer") && userId.ToString() != claimUserId)
             {
                 return Forbid("You can only view your own undelivered orders.");

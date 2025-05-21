@@ -9,7 +9,6 @@ namespace Raktar.Services
     public interface IOrderService
     {
         Task<OrderDTO> CreateOrderAsync(OrderCreateDTO orderCreateDTO);
-        Task<OrderDTO> AddItemToOrderAsync(int orderId,AddOrderItemDTO dto);
         Task<OrderDTO> GetOrderByIdAsync(int id);
         Task<bool> ChangeStatusAsync(int orderId, OrderStatusDTO status);
         Task<IEnumerable<OrderDTO>> GetOrdersUndeliveredAsync();
@@ -17,8 +16,9 @@ namespace Raktar.Services
         Task<IEnumerable<OrderDTO>> GetOrdersByUserIdAsync(int userId);
         Task<IEnumerable<OrderDTO>> GetAllOrdersAsync();
         Task<OrderDTO> ChangeOrderAsync(int orderId, ChangeOrderDTO changeOrderDto);
-        Task<OrderDTO> AdminChangeOrderAsync(int orderId, ChangeOrderDTO changeOrderDto);
+        Task<OrderDTO> AdminChangeOrderAsync(int orderId, ChangeOrderAdminDTO changeOrderDto);
         Task<OrderDTO> ChangeDeliveryDateAsync(int orderId, DateTime newDeliveryDate);
+        Task<OrderDTO> AssignCarrier(int orderId, AssignOrderCarrierDTO dto);
 
     }
     public class OrderService : IOrderService
@@ -39,20 +39,6 @@ namespace Raktar.Services
             order.Status = OrderStatus.Pending;
 
             await _context.Orders.AddAsync(order);
-            await _context.SaveChangesAsync();
-
-            return _mapper.Map<OrderDTO>(order);
-        }
-
-        public async Task<OrderDTO> AddItemToOrderAsync(int orderId,AddOrderItemDTO dto)
-        {
-            Product product = await _context.Products.FindAsync(dto.ProductId)
-                ?? throw new KeyNotFoundException($"Product not found with id {dto.ProductId}.");
-            Order order = await _context.Orders.FindAsync(orderId)
-                ?? throw new KeyNotFoundException($"Order not found with id {orderId}.");
-
-            OrderItem orderItem = _mapper.Map<OrderItem>(dto);
-            await _context.OrderItems.AddAsync(orderItem);
             await _context.SaveChangesAsync();
 
             return _mapper.Map<OrderDTO>(order);
@@ -172,13 +158,6 @@ namespace Raktar.Services
         }
 
 
-        //public async Task<IEnumerable<OrderDTO>> GetAllOrdersAsync()
-        //{
-        //    return await _context.Orders
-        //        .Include(o => o.OrderItems)
-        //        .Select(o => _mapper.Map<OrderDTO>(o))
-        //        .ToListAsync();
-        //}
         public async Task<IEnumerable<OrderDTO>> GetAllOrdersAsync()
         {
             var orders = await _context.Orders
@@ -186,11 +165,13 @@ namespace Raktar.Services
                     .ThenInclude(oi => oi.Product)
                 .Include(o => o.DeliveryAdress)
                     .ThenInclude(a => a.SimpleAddress)
-                .ToListAsync();
+                .OrderBy(a => a.Status)
+                .ThenBy(a => a.OrderDate)
+                    .ToListAsync();
             return _mapper.Map<IEnumerable<OrderDTO>>(orders);
         }
 
-        public async Task<OrderDTO> AdminChangeOrderAsync(int orderId, ChangeOrderDTO changeOrderDto)
+        public async Task<OrderDTO> AdminChangeOrderAsync(int orderId, ChangeOrderAdminDTO changeOrderDto)
         {
             var order = await _context.Orders
                 .Include(o => o.OrderItems)
@@ -237,6 +218,9 @@ namespace Raktar.Services
                 var newAddress = new Address { SimpleAddress = simpleAddress };
                 order.DeliveryAdress = newAddress;
             }
+
+            if (changeOrderDto.CarrierId is not null)
+                order.CarrierId = changeOrderDto.CarrierId;
 
             // Note: We do not modify order.UserId. It remains as originally set.
             await _context.SaveChangesAsync();
@@ -289,6 +273,14 @@ namespace Raktar.Services
             return _mapper.Map<OrderDTO>(order);
         }
 
+        public async Task<OrderDTO> AssignCarrier(int orderId, AssignOrderCarrierDTO dto)
+        {
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId)
+                ?? throw new KeyNotFoundException($"Order with id {orderId} was not found.");
 
+            order.CarrierId = dto.CarrierId;
+            await _context.SaveChangesAsync();
+            return _mapper.Map<OrderDTO>(order);
+        }
     }
 }
